@@ -17,7 +17,7 @@ Projektet løser udfordringen med uoverskuelig kalendersøgning ved at tilbyde e
 
 ---
 
-## 🛠️ Teknisk Arkitektur
+## Teknisk Arkitektur
 
 Applikationen er opdelt i to uafhængige tjenester:
 
