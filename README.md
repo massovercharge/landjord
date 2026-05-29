@@ -1,6 +1,8 @@
-# Landjord Booking Dashboard 
+# Landjord Overbliks-Dashboard
 
-Landjord Booking Dashboard er et lynhurtigt, moderne og alternativt interface til at skabe overblik over hvor og hvornår lejrpladser på **Landjord.com** er ledige.
+Dette projekt er et lynhurtigt, moderne og alternativt interface til at skabe overblik over, hvor og hvornår lejrpladser på **Landjord.com** er ledige. 
+
+**Vigtigt:** Applikationen er designet som et rent *Read-Only* værktøj. Systemet læser udelukkende offentligt tilgængelig data fra Landjord.com for at generere overblikket, og den **sender intet data, interaktioner eller bookinger den anden vej**. Alt der kræver input, foregår direkte på den officielle platform. Alt, hvad der har med selve bookingen at gøre, foregår direkte hos Landjord.
 
 Projektet løser udfordringen med uoverskuelig kalendersøgning ved at tilbyde en række smarte visninger, der gør det markant lettere at planlægge ture ud i naturen. Samtidig omgår backend-proxyen server-udfordringer (WAF browser verifikation) gennem en varm, headless Playwright session.
 
@@ -12,7 +14,7 @@ Projektet løser udfordringen med uoverskuelig kalendersøgning ved at tilbyde e
 *   **Geolokalisering (Distance Filter)**: Klik på kompaspilen for at tillade browseren at finde din lokation automatisk. Systemet sorterer derefter alle pladser efter afstanden til dig, beregnet i luftlinje.
 *   **Fleksibel Weekend-mode**: Søg ikke kun på hele weekender, men filtrer lynhurtigt for 1 overnatning (f.eks. kun Fredag-Lørdag eller Lørdag-Søndag).
 *   **Interaktive "Hover" Kort & Billeder**: Få øjeblikkeligt vist pladsens geografiske placering på et kort eller store billeder af naturen blot ved at holde musen over pladsens navn – uden unødige klik.
-*   **Lynhurtig Booking**: Integreret og formstøbt modal, der lader dig booke direkte fra kalendervisningen eller kortet, mens proxyen ordner OTP-verificeringen i baggrunden.
+*   **Direkte Viderestilling**: Genveje integreret i alle visninger, der tager dig direkte videre til den specifikke plads på det officielle Landjord.com-website, hvor du kan foretage din booking.
 *   **Mørkt Tema**: Moderne, rent og roligt design, der er behageligt for øjnene.
 
 ---
