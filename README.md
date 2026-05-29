@@ -1,6 +1,6 @@
 # Landjord Booking Dashboard 
 
-Landjord Booking Dashboard er et lynhurtigt, moderne og alternativt interface til reservation af telt- og shelterpladser på det populære netværk **Landjord.com**.
+Landjord Booking Dashboard er et lynhurtigt, moderne og alternativt interface til at skabe overblik over hvor og hvornår lejrpladser på **Landjord.com** er ledige.
 
 Projektet løser udfordringen med uoverskuelig kalendersøgning ved at tilbyde en række smarte visninger, der gør det markant lettere at planlægge ture ud i naturen. Samtidig omgår backend-proxyen server-udfordringer (WAF browser verifikation) gennem en varm, headless Playwright session.
 
