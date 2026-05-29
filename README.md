@@ -1,4 +1,4 @@
-# Landjord Booking Dashboard 🏕️
+# Landjord Booking Dashboard 
 
 Landjord Booking Dashboard er et lynhurtigt, moderne og alternativt interface til reservation af telt- og shelterpladser på det populære netværk **Landjord.com**.
 
@@ -6,10 +6,10 @@ Projektet løser udfordringen med uoverskuelig kalendersøgning ved at tilbyde e
 
 ---
 
-## ✨ Features
+## Features
 
 *   **90-dages Matrix Kalender**: Et massivt, scrollbart overblik over ledige dage på tværs af pladser med ugenumre og fremhævning af weekender.
-*   **Geolokalisering (Distance Filter)**: Klik på "🎯"-knappen for at tillade browseren at finde din lokation automatisk. Systemet sorterer derefter alle pladser efter afstanden til dig, beregnet i luftlinje.
+*   **Geolokalisering (Distance Filter)**: Klik på kompaspilen for at tillade browseren at finde din lokation automatisk. Systemet sorterer derefter alle pladser efter afstanden til dig, beregnet i luftlinje.
 *   **Fleksibel Weekend-mode**: Søg ikke kun på hele weekender, men filtrer lynhurtigt for 1 overnatning (f.eks. kun Fredag-Lørdag eller Lørdag-Søndag).
 *   **Interaktive "Hover" Kort & Billeder**: Få øjeblikkeligt vist pladsens geografiske placering på et kort eller store billeder af naturen blot ved at holde musen over pladsens navn – uden unødige klik.
 *   **Lynhurtig Booking**: Integreret og formstøbt modal, der lader dig booke direkte fra kalendervisningen eller kortet, mens proxyen ordner OTP-verificeringen i baggrunden.
@@ -31,7 +31,7 @@ Applikationen er opdelt i to uafhængige tjenester:
 
 ---
 
-## 🚀 Deployment
+## Deployment
 
 ### Metode 1: Standard Docker Compose (Fra kildekode)
 Den nemmeste måde at starte projektet lokalt på, er ved blot at lade Docker Compose bygge og starte det hele i én kommando – uden yderligere indgriben:
@@ -55,19 +55,19 @@ Portainer vil nu automatisk downloade filerne, bygge de to Docker-images (`backe
 
 ---
 
-## 🖼️ Billeder & Copyright (Legal Safeguard)
+## Billeder & Copyright (Legal Safeguard)
 For at sikre at projektet ikke automatisk distribuerer eller indlæser tredjeparts ophavsretligt beskyttet materiale (billeder af lejrpladser), er hentning af billeder **deaktiveret som standard**.
 
 Hvis du hoster projektet privat og selv ønsker at se billeder fra Landjord, skal du åbne filen `frontend/src/App.jsx` og ændre flaget i toppen af filen (linje ~20) fra `false` til `true`:
 ```javascript
-// 🛑 LEGAL SAFEGUARD: Set to true to enable displaying copyrighted images from landjord.com
+// LEGAL SAFEGUARD: Set to true to enable displaying copyrighted images from landjord.com
 const ENABLE_EXTERNAL_IMAGES = true;
 ```
 Herefter skal du genbygge din frontend container.
 
 ---
 
-## 🛑 Stop eller genstart
+## Stop eller genstart
 For at stoppe serveren:
 ```bash
 docker compose down
@@ -80,7 +80,7 @@ docker compose logs -f
 
 ---
 
-## ⚠️ Juridisk Ansvarsfraskrivelse (Disclaimer)
+## Juridisk Ansvarsfraskrivelse (Disclaimer)
 
 **Dette projekt er uofficielt og udelukkende skabt til uddannelses- og forskningsmæssige formål (Proof of Concept).**
 
