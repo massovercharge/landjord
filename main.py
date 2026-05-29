@@ -5,7 +5,7 @@ from playwright.async_api import async_playwright
 import json
 import asyncio
 
-app = FastAPI(title="Landjord Booking API Proxy")
+app = FastAPI(title="Landjord Overblik API Proxy")
 
 app.add_middleware(
     CORSMiddleware,

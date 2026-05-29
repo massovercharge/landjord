@@ -1,4 +1,4 @@
-# Landjord Overbliks-Dashboard
+# Landjord Overblik (Uofficielt)
 
 Dette projekt er et lynhurtigt, moderne og alternativt interface til at skabe overblik over, hvor og hvornår lejrpladser på **Landjord.com** er ledige. 
 

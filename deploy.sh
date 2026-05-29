@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Starter Landjord Dashboard deployment..."
+echo "🚀 Starter Landjord Overblik (Uofficielt) deployment..."
 
 # Tjekker om docker compose (eller docker-compose) findes
 if command -v docker &> /dev/null && docker compose version &> /dev/null; then

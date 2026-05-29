@@ -451,7 +451,7 @@ function App() {
       <header className="filter-bar">
         <div className="filter-content">
           <div className="logo">
-            <h1>Landjord Pladser</h1>
+            <h1>Landjord Overblik (Uofficielt)</h1>
           </div>
           
           <div className="view-toggles">
