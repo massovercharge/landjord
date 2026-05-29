@@ -2,7 +2,7 @@
 
 Dette projekt er et lynhurtigt, moderne og alternativt interface til at skabe overblik over, hvor og hvornår lejrpladser på **Landjord.com** er ledige. 
 
-**Vigtigt:** Applikationen er designet som et rent *Read-Only* værktøj. Systemet læser udelukkende offentligt tilgængelig data fra Landjord.com for at generere overblikket, og den **sender intet data, interaktioner eller bookinger den anden vej**. Alt der kræver input, foregår direkte på den officielle platform. Alt, hvad der har med selve bookingen at gøre, foregår direkte hos Landjord.
+**Vigtigt:** Applikationen er designet som et rent *Read-Only* værktøj. Systemet læser udelukkende offentligt tilgængelig data fra Landjord.com for at generere overblikket, og den **sender intet data, interaktioner eller bookinger den anden vej**. Alt der kræver input, foregår direkte på den officielle platform.
 
 Projektet løser udfordringen med uoverskuelig kalendersøgning ved at tilbyde en række smarte visninger, der gør det markant lettere at planlægge ture ud i naturen. Samtidig omgår backend-proxyen server-udfordringer (WAF browser verifikation) gennem en varm, headless Playwright session.
 
