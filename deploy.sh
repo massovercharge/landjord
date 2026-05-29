@@ -15,5 +15,5 @@ else
 fi
 
 echo "✅ Deployment færdig!"
-echo "➡️  Frontend kører på: http://localhost:8080"
+echo "➡️  Frontend kører på: http://localhost:5821"
 echo "➡️  Backend API proxy kører på: http://localhost:8000"
