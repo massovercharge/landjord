@@ -42,6 +42,8 @@ docker compose up -d --build
 ```
 *(Alternativt kan du køre `bash deploy.sh` for en endnu mere guidet opstart).*
 
+**Vigtigt om Sikkerhed & Lokalisering:** For at browserens lokalisering (kompasset) kan fungere på lokale netværk (f.eks. på en hjemmeserver), bygger containeren automatisk et selv-signeret SSL-certifikat. Du skal derfor tilgå dashboardet via **HTTPS** (f.eks. `https://localhost:5821` eller din servers IP). Browseren vil advare om at certifikatet er "usikkert", men du klikker bare "Avanceret -> Fortsæt" for at få adgang.
+
 ### Metode 2: Portainer (Via Git Repository / Stacks)
 Projektet er bygget til fuld integration med **Portainer**. Du kan lade Portainer hente og bygge projektet direkte fra Git uden du behøver en terminal:
 1. Åbn din Portainer instans og gå til **Stacks**.

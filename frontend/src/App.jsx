@@ -16,7 +16,7 @@ L.Icon.Default.mergeOptions({
 });
 
 // 🛑 LEGAL SAFEGUARD: Set to true to enable displaying copyrighted images from landjord.com
-const ENABLE_EXTERNAL_IMAGES = false;
+const ENABLE_EXTERNAL_IMAGES = true;
 
 // Helper for coordinates distance
 function getDistanceInKm(lat1, lon1, lat2, lon2) {

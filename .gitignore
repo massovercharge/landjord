@@ -7,4 +7,3 @@ dist/
 .env
 test_frontend.py
 session_learnings.md
-docker-compose.traefik.yml
