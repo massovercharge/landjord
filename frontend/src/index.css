@@ -491,20 +491,19 @@ body {
   }
   
   .matrix-site-name {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
     line-height: 1.2;
     white-space: normal;
+    word-break: break-word;
   }
   
-  .matrix-site-name span:first-child {
-    word-break: break-word;
+  .matrix-site-name span {
+    display: block;
   }
   
   .matrix-site-name .dist {
     font-size: 0.7rem;
     margin-left: 0;
+    margin-top: 0.2rem;
   }
   
   .matrix-table th, .matrix-table td {
