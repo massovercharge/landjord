@@ -24,12 +24,21 @@ Projektet løser udfordringen med uoverskuelig kalendersøgning ved at tilbyde e
 Applikationen er opdelt i to uafhængige tjenester:
 
 1.  **Frontend (React + Vite)**: 
-    *   Responsive og lynende hurtig SPA.
-    *   Tilstands- og proxy-afhængig kommunikation for at omgå direkte CORS begrænsninger.
+    *   Responsive og lynende hurtig SPA (Single Page Application).
+    *   Koden er modulært opbygget med isolerede komponenter for kort, matrix og weekend-visning.
+    *   Indeholder omfattende Unit-tests (Vitest) for distanceudregninger og tidszoner for at forhindre UTC-bugging.
 2.  **Backend Proxy (Python + FastAPI + Playwright)**:
-    *   Henter løbende ledighed og pladsdata via en headless Chromium browser.
-    *   Ekstraherer React/Inertia JSON payloads direkte fra `data-page` attributterne i DOM'en for at undgå API scraping.
-    *   Bypasser automatisk Simply.com's browserverifikationer.
+    *   Kører en isoleret og sikker baggrundstråd, som henter ledighed og pladsdata via headless Chromium hver time.
+    *   Serverer udelukkende fra en lynhurtig indbygget memory-cache (`/api/sites_full`), for at undgå API overload og Playwright race-conditions.
+    *   Ekstraherer React/Inertia JSON payloads direkte fra `data-page` attributterne i DOM'en for at omgå WAF og bot-beskyttelse.
+
+---
+
+## Testsuite
+Projektet er sikret via moderne test-frameworks:
+
+- **Frontend (Vitest):** Kør `npm run test` inde i `/frontend` mappen for at sikre at afstandsberegninger og dato-formatering kører fejlfrit.
+- **Backend (Pytest):** Kør `pytest tests/` i roden for at teste proxy cachen.
 
 ---
 
