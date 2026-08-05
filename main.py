@@ -79,7 +79,10 @@ async def background_fetch_all_data():
 async def startup_event():
     global pw, browser, context, page
     pw = await async_playwright().start()
-    browser = await pw.chromium.launch(headless=True)
+    browser = await pw.chromium.launch(
+        headless=True,
+        args=["--disable-features=AsyncDns", "--disable-dev-shm-usage"]
+    )
     context = await browser.new_context(
         user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     )

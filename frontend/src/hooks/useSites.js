@@ -5,7 +5,8 @@ export function useSites() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/sites_full')
+    // Prevent browser from caching to ensure calendar stays up to date
+    fetch('/api/sites_full', { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
         const extractedSites = data?.sites?.data || data?.sites || data || [];
