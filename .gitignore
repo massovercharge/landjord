@@ -8,3 +8,6 @@ dist/
 test_frontend.py
 session_learnings.md
 .venv/
+.coverage
+db.sqlite
+frontend/coverage/

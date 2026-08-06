@@ -5,6 +5,10 @@ from playwright.async_api import async_playwright
 import json
 import asyncio
 import traceback
+import os
+import db
+
+ENABLE_TREND_ANALYSIS = os.getenv("ENABLE_TREND_ANALYSIS", "true").lower() == "true"
 
 app = FastAPI(title="Landjord Overblik API Proxy")
 
@@ -57,6 +61,17 @@ async def background_fetch_all_data():
                         site['images'] = detail['images']
                     if 'description' in detail:
                         site['description'] = detail['description']
+                        
+                    if ENABLE_TREND_ANALYSIS:
+                        db.save_snapshot(site['slug'], site.get('occupiedDates', []))
+                        site['popularity_score'] = db.get_popularity_score(site['slug'])
+                        
+                    # Hent og tilføj POI data
+                    lat = site.get('latitude', 0.0)
+                    lon = site.get('longitude', 0.0)
+                    if lat and lon:
+                        site['pois'] = db.get_pois(site['slug'], lat, lon)
+                        
                     full_sites.append(site)
                 except Exception as e:
                     print(f"Kunne ikke hente detaljer for {site['slug']}: {e}")
@@ -77,6 +92,7 @@ async def background_fetch_all_data():
 
 @app.on_event("startup")
 async def startup_event():
+    db.init_db()
     global pw, browser, context, page
     pw = await async_playwright().start()
     browser = await pw.chromium.launch(

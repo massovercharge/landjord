@@ -1,39 +1,24 @@
 import pytest
 from fastapi.testclient import TestClient
-from main import app, cached_full_sites, data_ready_event
+import sys
+import os
 
-client = TestClient(app)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import main
+from db import init_db
 
-@pytest.fixture(autouse=True)
-def mock_cached_data():
-    # Mock data directly in the global state of main.py
-    global cached_full_sites
-    
-    mock_data = [
-        {
-            "slug": "test-plads",
-            "name": "Test Plads",
-            "latitude": 55.0,
-            "longitude": 10.0,
-            "occupiedDates": ["2026-06-25"]
-        }
-    ]
-    
-    # Overwrite the global cache for the test
-    import main
-    main.cached_full_sites = mock_data
-    main.data_ready_event.set()
-    
-    yield
-    
-    # Reset
-    main.cached_full_sites = []
-    main.data_ready_event.clear()
+init_db()
 
-def test_get_all_sites_full_returns_data():
+# Mock the cache so we don't have to wait for Playwright in tests
+main.cached_full_sites = [{"slug": "test-site", "name": "Test Site", "popularity_score": "hot"}]
+main.data_ready_event.set()
+
+client = TestClient(main.app)
+
+def test_read_sites_full():
     response = client.get("/api/sites_full")
     assert response.status_code == 200
     data = response.json()
     assert "sites" in data
-    assert len(data["sites"]) == 1
-    assert data["sites"][0]["slug"] == "test-plads"
+    assert isinstance(data["sites"], list)
+    assert data["sites"][0]["popularity_score"] == "hot"

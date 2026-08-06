@@ -8,6 +8,8 @@ import FilterBar from './components/FilterBar';
 import MapView from './components/MapView';
 import MatrixView from './components/MatrixView';
 import WeekendsView from './components/WeekendsView';
+import HelpModal from './components/HelpModal';
+import HomeView from './components/HomeView';
 
 import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -31,9 +33,10 @@ function App() {
   // App Modes
   const getInitialViewMode = () => {
     const hash = window.location.hash.replace('#', '');
-    return ['map', 'matrix', 'weekends'].includes(hash) ? hash : 'map';
+    return ['home', 'map', 'matrix', 'weekends'].includes(hash) ? hash : 'home';
   };
   const [viewMode, setViewMode] = useState(getInitialViewMode());
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   // Sync viewMode to URL hash
   useEffect(() => {
@@ -44,7 +47,7 @@ function App() {
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['map', 'matrix', 'weekends'].includes(hash)) {
+      if (['home', 'map', 'matrix', 'weekends'].includes(hash)) {
         setViewMode(hash);
       }
     };
@@ -158,6 +161,7 @@ function App() {
       <FilterBar 
         viewMode={viewMode}
         setViewMode={setViewMode}
+        onOpenHelp={() => setIsHelpOpen(true)}
         filterStart={filterStart}
         setFilterStart={setFilterStart}
         filterEnd={filterEnd}
@@ -180,6 +184,9 @@ function App() {
           </div>
         ) : (
           <>
+            {viewMode === 'home' && (
+              <HomeView sites={sites} setViewMode={setViewMode} />
+            )}
             {viewMode === 'map' && (
               <MapView 
                 sites={filteredAndSortedSites} 
@@ -206,6 +213,7 @@ function App() {
           </>
         )}
       </main>
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
 }

@@ -111,8 +111,17 @@ export default function WeekendsView({ sites, getImageUrl, goToBooking, enableEx
                                )}
                             </div>
                             <div className="info">
-                               <h4>{site.name}</h4>
+                               <h4>
+                                 {site.name}
+                                 {site.popularity_score === 'hot' && <span title="Høj efterspørgsel" style={{marginLeft:'5px'}}>🔥</span>}
+                               </h4>
                                {site.distance !== undefined && <span className="dist">📍 {site.distance} km</span>}
+                               {site.pois && (
+                                 <div className="poi-badges" style={{display:'flex', gap:'5px', fontSize:'11px', marginTop:'6px', color:'#e2e8f0'}}>
+                                    <span style={{background:'#334155', padding:'2px 6px', borderRadius:'4px'}}>🛒 {site.pois.supermarket}km</span>
+                                    <span style={{background:'#334155', padding:'2px 6px', borderRadius:'4px'}}>🚌 {site.pois.bus}km</span>
+                                 </div>
+                               )}
                                <button onClick={() => goToBooking(site, wknd.start, wknd.end)}>Se plads</button>
                             </div>
                          </div>

@@ -15,6 +15,9 @@ Projektet løser udfordringen med uoverskuelig kalendersøgning ved at tilbyde e
 *   **Fleksibel Weekend-mode**: Søg ikke kun på hele weekender, men filtrer lynhurtigt for 1 overnatning (f.eks. kun Fredag-Lørdag eller Lørdag-Søndag).
 *   **Interaktive "Hover" Kort & Billeder**: Få øjeblikkeligt vist pladsens geografiske placering på et kort eller store billeder af naturen blot ved at holde musen over pladsens navn – uden unødige klik.
 *   **Direkte Viderestilling**: Genveje integreret i alle visninger, der tager dig direkte videre til den specifikke plads på det officielle Landjord.com-website, hvor du kan foretage din booking.
+*   **Historiske Trends (Scarcity)**: Systemet sporer løbende efterspørgsel i en lokal SQLite-database og fremhæver populære pladser (🔥) i oversigterne.
+*   **POI-Berigelse (Indkøb & Transport)**: Systemet beregner afstand i fugleflugt til nærmeste supermarked (🛒) og busstoppested (🚌).
+*   **PWA (Progressive Web App)**: Applikationen kan installeres direkte på telefonens hjemmeskærm (iOS og Android) og fungerer som en native app.
 *   **Mørkt Tema**: Moderne, rent og roligt design, der er behageligt for øjnene.
 
 ---

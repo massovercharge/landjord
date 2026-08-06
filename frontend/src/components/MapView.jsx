@@ -16,8 +16,16 @@ export default function MapView({ sites, userCoords, getImageUrl, goToBooking })
           <Popup className="site-popup">
             <div className="popup-content">
               {getImageUrl(site) && <img src={getImageUrl(site)} alt={site.name} className="popup-image" />}
-              <h3>{site.name || site.title}</h3>
+              <h3>
+                {site.name || site.title}
+                {site.popularity_score === 'hot' && <span title="Høj efterspørgsel" style={{marginLeft:'5px', fontSize:'16px'}}>🔥</span>}
+              </h3>
               {site.distance !== undefined && <div className="dist-badge">{site.distance} km væk</div>}
+              {site.pois && (
+                 <div style={{fontSize:'12px', margin:'5px 0', color:'#666'}}>
+                   🛒 {site.pois.supermarket}km | 🚌 {site.pois.bus}km
+                 </div>
+              )}
               <button className="book-btn-small" onClick={() => goToBooking(site)}>Gå til booking</button>
             </div>
           </Popup>

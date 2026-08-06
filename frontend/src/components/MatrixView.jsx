@@ -71,7 +71,13 @@ export default function MatrixView({ sites, getImageUrl, goToBooking }) {
                        onMouseLeave={() => setMatrixHoverImg(null)}
                      >
                         <strong>{site.name}</strong>
+                        {site.popularity_score === 'hot' && <span title="Meget populær plads" style={{marginLeft: '5px', fontSize: '14px'}}>🔥</span>}
                         {site.distance !== undefined && <div className="dist">{site.distance} km</div>}
+                        {site.pois && (
+                          <div className="pois-mini" style={{fontSize:'10px', color:'#aaa', marginTop:'4px'}}>
+                             🛒 {site.pois.supermarket}km 🚌 {site.pois.bus}km
+                          </div>
+                        )}
                      </td>
                      {dates.map(d => {
                         const isWeekend = d.getDay() === 0 || d.getDay() === 5 || d.getDay() === 6;

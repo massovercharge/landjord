@@ -3,6 +3,7 @@ import React from 'react';
 export default function FilterBar({ 
   viewMode, 
   setViewMode, 
+  onOpenHelp,
   filterStart, 
   setFilterStart, 
   filterEnd, 
@@ -21,9 +22,11 @@ export default function FilterBar({
       <div className="filter-content">
         <div className="logo">
           <h1>Landjord Overblik (Uofficielt)</h1>
+          <button className="help-btn" onClick={onOpenHelp} title="Hjælp & Opslagsværk">❓ Hjælp</button>
         </div>
         
         <div className="view-toggles">
+          <button className={viewMode === 'home' ? 'active' : ''} onClick={() => setViewMode('home')}>🏠 Forside</button>
           <button className={viewMode === 'map' ? 'active' : ''} onClick={() => setViewMode('map')}>🗺️ Kort</button>
           <button className={viewMode === 'matrix' ? 'active' : ''} onClick={() => setViewMode('matrix')}>📊 Kalender</button>
           <button className={viewMode === 'weekends' ? 'active' : ''} onClick={() => setViewMode('weekends')}>🏕️ Weekender</button>
@@ -43,7 +46,7 @@ export default function FilterBar({
               <button className="clear-btn" onClick={() => { setFilterStart(''); setFilterEnd(''); }}>Nulstil</button>
             )}
           </div>
-        ) : (
+        ) : viewMode !== 'home' ? (
           <form className="location-filter" onSubmit={handleLocationSearch}>
             <div className="filter-input-group relative-input">
               <input 
@@ -63,9 +66,10 @@ export default function FilterBar({
             </button>
             {userCoords && <button type="button" className="clear-btn" onClick={() => { setSearchLocation(''); setUserCoords(null); }}>✖</button>}
           </form>
-        )}
+        ) : null}
       </div>
       <div className="mode-help-text">
+         {viewMode === 'home' && "🏠 Velkommen til Landjord Overblik. Brug fanebladene ovenfor til at finde ledige pladser."}
          {viewMode === 'map' && "📍 Geografisk overblik: Perfekt når du kender dine eksakte rejsedatoer og hurtigt vil se de ledige muligheder på et Danmarkskort."}
          {viewMode === 'matrix' && "📊 Det store puslespil: Ideelt til den fleksible tur. Få overblikket over alle pladsernes ledige 'huller', så du nemt kan matche dem med dine fridage."}
          {viewMode === 'weekends' && "🏕️ Hurtig getaway: Skræddersyet til weekendture. Vi har samlet de næste 8 weekender, så du lynhurtigt kan se præcis hvilke pladser der er ledige fra fredag til søndag."}
