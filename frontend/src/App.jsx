@@ -10,6 +10,8 @@ import MatrixView from './components/MatrixView';
 import WeekendsView from './components/WeekendsView';
 import HelpModal from './components/HelpModal';
 import HomeView from './components/HomeView';
+import StatsView from './components/StatsView';
+import EditAlertView from './components/EditAlertView';
 
 import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -32,8 +34,8 @@ function App() {
   
   // App Modes
   const getInitialViewMode = () => {
-    const hash = window.location.hash.replace('#', '');
-    return ['home', 'map', 'matrix', 'weekends'].includes(hash) ? hash : 'home';
+    const hash = window.location.hash.split('?')[0].replace('#', '');
+    return ['home', 'map', 'matrix', 'weekends', 'stats', 'edit-alert'].includes(hash) ? hash : 'home';
   };
   const [viewMode, setViewMode] = useState(getInitialViewMode());
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -46,8 +48,8 @@ function App() {
   // Handle browser back/forward buttons
   useEffect(() => {
     const handleHashChange = () => {
-      const hash = window.location.hash.replace('#', '');
-      if (['home', 'map', 'matrix', 'weekends'].includes(hash)) {
+      const hash = window.location.hash.split('?')[0].replace('#', '');
+      if (['home', 'map', 'matrix', 'weekends', 'stats', 'edit-alert'].includes(hash)) {
         setViewMode(hash);
       }
     };
@@ -187,6 +189,9 @@ function App() {
             {viewMode === 'home' && (
               <HomeView sites={sites} setViewMode={setViewMode} />
             )}
+            {viewMode === 'stats' && (
+              <StatsView sites={sites} />
+            )}
             {viewMode === 'map' && (
               <MapView 
                 sites={filteredAndSortedSites} 
@@ -209,6 +214,9 @@ function App() {
                 goToBooking={goToBooking} 
                 enableExternalImages={ENABLE_EXTERNAL_IMAGES}
               />
+            )}
+            {viewMode === 'edit-alert' && (
+              <EditAlertView />
             )}
           </>
         )}

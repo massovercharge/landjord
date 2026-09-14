@@ -1,12 +1,13 @@
-import React, { useState, useMemo } from 'react';
-import { getISOWeek, getLocalDateString } from '../utils/helpers';
+import React, { useState, useMemo, useCallback } from 'react';
+import { getISOWeek, getLocalDateString, getDanishHoliday } from '../utils/helpers';
 
 export default function MatrixView({ sites, getImageUrl, goToBooking }) {
   const [matrixHoverImg, setMatrixHoverImg] = useState(null);
+  const [daysCount, setDaysCount] = useState(90);
 
   // Memoize dates and weeks so we don't recalculate on every render
   const { dates, weeks } = useMemo(() => {
-    const datesArray = Array.from({length: 90}, (_, i) => {
+    const datesArray = Array.from({length: daysCount}, (_, i) => {
        const d = new Date(); d.setDate(d.getDate() + i); return d;
     });
 
@@ -23,15 +24,23 @@ export default function MatrixView({ sites, getImageUrl, goToBooking }) {
     });
 
     return { dates: datesArray, weeks: weeksArray };
+  }, [daysCount]);
+
+  const handleScroll = useCallback((e) => {
+    const { scrollLeft, scrollWidth, clientWidth } = e.target;
+    // Load more when user is 500px from the right edge
+    if (scrollLeft + clientWidth >= scrollWidth - 500) {
+      setDaysCount(prev => Math.min(prev + 30, 365));
+    }
   }, []);
 
   return (
      <div className="view-container matrix-view">
        <div className="view-header">
-          <h2>Kalendervisning (90 dage)</h2>
+          <h2>Kalendervisning ({daysCount} dage)</h2>
           <p><strong>Tip:</strong> Grøn = Ledig. Fredag-søndag er fremhævet let. Hold musen over et pladsnavn for at se et billede. Klik på et grønt felt for at booke den pågældende nat.</p>
        </div>
-       <div className="matrix-table-wrapper">
+       <div className="matrix-table-wrapper" onScroll={handleScroll}>
          <table className="matrix-table">
             <thead>
                <tr>
@@ -45,8 +54,10 @@ export default function MatrixView({ sites, getImageUrl, goToBooking }) {
                <tr>
                   {dates.map(d => {
                      const isWeekend = d.getDay() === 0 || d.getDay() === 5 || d.getDay() === 6;
+                     const holidayName = getDanishHoliday(d);
+                     const isHighlighted = isWeekend || holidayName;
                      return (
-                     <th key={getLocalDateString(d)} className={isWeekend ? 'weekend-col' : ''}>
+                     <th key={getLocalDateString(d)} className={isHighlighted ? 'weekend-col' : ''} title={holidayName || ''}>
                         <div className="date-header">
                           <span className="weekday">{d.toLocaleDateString('da-DK', {weekday:'short'})}</span>
                           <span className="day">{d.getDate()}/{d.getMonth()+1}</span>
@@ -81,6 +92,8 @@ export default function MatrixView({ sites, getImageUrl, goToBooking }) {
                      </td>
                      {dates.map(d => {
                         const isWeekend = d.getDay() === 0 || d.getDay() === 5 || d.getDay() === 6;
+                        const holidayName = getDanishHoliday(d);
+                        const isHighlighted = isWeekend || holidayName;
                         const dateStr = getLocalDateString(d);
                         const isOccupied = (site.occupiedDates || []).includes(dateStr);
                         
@@ -92,7 +105,7 @@ export default function MatrixView({ sites, getImageUrl, goToBooking }) {
                         return (
                            <td 
                              key={dateStr} 
-                             className={`matrix-cell ${isOccupied ? 'occupied' : 'free'} ${isWeekend ? 'weekend-col' : ''}`}
+                             className={`matrix-cell ${isOccupied ? 'occupied' : 'free'} ${isHighlighted ? 'weekend-col' : ''}`}
                              onClick={() => !isOccupied && goToBooking(site, dateStr, nextDayStr)}
                              title={isOccupied ? "Optaget" : "Book 1 nat"}
                            >

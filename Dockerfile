@@ -10,7 +10,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend code
-COPY main.py db.py .
+COPY main.py db.py mailer.py .
 
 # Expose port
 EXPOSE 8000

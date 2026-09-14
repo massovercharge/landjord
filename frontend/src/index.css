@@ -592,3 +592,149 @@ body {
 .support-link:hover { background: #2563eb; }
 
 .ig-embed-container { display: flex; justify-content: center; background: #fff; border-radius: 12px; padding: 5px; }
+
+/* Stats View */
+.stats-view { color: #f8fafc; }
+.stats-charts-grid { display: grid; grid-template-columns: 1fr; gap: 30px; margin-top: 20px; }
+.chart-card { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--card-border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+.chart-card h3 { margin-top: 0; color: #4ade80; margin-bottom: 20px; font-size: 1.3rem; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
+.chart-wrapper { width: 100%; overflow-x: auto; }
+.no-data { color: #94a3b8; font-style: italic; }
+.chart-desc { font-size: 0.9rem; color: #94a3b8; margin-top: -10px; margin-bottom: 20px; font-style: italic; }
+
+/* Stats Filters */
+.stats-filters { display: flex; flex-wrap: wrap; gap: 20px; background: var(--card-bg); padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--card-border); }
+.filter-group { display: flex; flex-direction: column; gap: 8px; flex: 1; min-width: 200px; }
+.filter-group label { color: #94a3b8; font-size: 0.9rem; font-weight: bold; }
+.site-select { padding: 10px; background: #1e1e1e; color: #fff; border: 1px solid #333; border-radius: 6px; font-size: 1rem; }
+.period-pills { display: flex; gap: 10px; }
+.period-pills button { padding: 8px 16px; background: #1e1e1e; color: #ccc; border: 1px solid #333; border-radius: 20px; cursor: pointer; transition: 0.2s; }
+.period-pills button.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+.top-sites-card { grid-column: 1 / -1; }
+@media(min-width: 900px) {
+  .stats-charts-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Availability Grid */
+.availability-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px; margin-top: 10px; }
+.grid-day { height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-size: 0.75rem; font-weight: bold; transition: transform 0.1s; cursor: pointer; }
+.grid-day:hover { transform: scale(1.1); }
+.grid-day.free { background: #166534; color: #bbf7d0; border: 1px solid #15803d; }
+.grid-day.booked { background: #991b1b; color: #fecaca; border: 1px solid #b91c1c; }
+.grid-day.weekend { border-bottom: 3px solid #f59e0b; }
+
+/* Booking Calendar */
+.booking-calendar-wrapper { width: 100%; max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+.booking-calendar-header { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; color: #94a3b8; font-size: 0.8rem; font-weight: bold; }
+.booking-calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.calendar-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+.calendar-day:hover:not(.empty) { transform: scale(1.05); }
+.calendar-day.empty { background: transparent; cursor: default; }
+.calendar-day.free { background: #166534; border: 1px solid #15803d; color: #bbf7d0; }
+.calendar-day.booked { background: #1e293b; border: 1px solid #334155; color: #475569; position: relative; }
+.calendar-day.booked::after { content: ""; position: absolute; top: 50%; left: 10%; width: 80%; height: 2px; background: #ef4444; transform: translateY(-50%) rotate(-45deg); opacity: 0.7; }
+.date-number { font-size: 1.1rem; font-weight: bold; line-height: 1; }
+.date-month { font-size: 0.6rem; text-transform: uppercase; margin-top: 2px; opacity: 0.8; }
+.calendar-day.booked .date-number, .calendar-day.booked .date-month { text-decoration: line-through; opacity: 0.5; }
+
+/* Watchlist Feature CSS */
+.watchlist-btn {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s;
+}
+.watchlist-btn:hover {
+  background: var(--accent-hover);
+}
+.watchlist-modal h3 { margin-top: 0; color: #4ade80; margin-bottom: 0.5rem; }
+.watchlist-modal form p { margin-top: 0; margin-bottom: 1rem; color: #94a3b8; }
+.watchlist-modal .form-group { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.watchlist-modal .form-group.row { flex-direction: row; gap: 1rem; }
+.watchlist-modal .flex-1 { flex: 1; display: flex; flex-direction: column; gap: 0.25rem; }
+.watchlist-modal input[type="email"], .watchlist-modal input[type="date"] {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid var(--card-border);
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-family: inherit;
+  color-scheme: dark;
+}
+.watchlist-modal input:focus { outline: none; border-color: var(--accent-color); }
+.watchlist-modal .radio-group { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem; }
+.watchlist-modal .radio-label, .watchlist-modal .checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+.watchlist-modal .btn-primary { 
+  width: 100%; 
+  margin-top: 1rem; 
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.watchlist-modal .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.watchlist-modal .close-btn { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer; }
+.watchlist-modal .close-btn:hover { color: white; }
+.success-message { text-align: center; }
+.success-message h4 { color: var(--success-color); font-size: 1.5rem; margin-bottom: 0.5rem; }
+.success-message p { color: #94a3b8; margin-bottom: 1.5rem; }
+.error-message { color: var(--danger-color); font-size: 0.9rem; margin-top: 0.5rem; text-align: center; }
+
+/* Custom Datepicker Overrides */
+.watchlist-modal .react-datepicker-wrapper { width: 100%; }
+.watchlist-modal .react-datepicker__input-container input {
+  width: 100%;
+  box-sizing: border-box;
+}
+.react-datepicker {
+  background-color: var(--card-bg) !important;
+  border-color: var(--card-border) !important;
+  color: white !important;
+  font-family: inherit !important;
+}
+.react-datepicker__header {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+  border-bottom-color: var(--card-border) !important;
+}
+.react-datepicker__current-month, .react-datepicker-time__header, .react-datepicker-year-header {
+  color: white !important;
+}
+.react-datepicker__day-name {
+  color: #94a3b8 !important;
+}
+.react-datepicker__day {
+  color: white !important;
+}
+.react-datepicker__day:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+.react-datepicker__day--selected, .react-datepicker__day--in-selecting-range, .react-datepicker__day--in-range, .react-datepicker__month-text--selected, .react-datepicker__month-text--in-selecting-range, .react-datepicker__month-text--in-range, .react-datepicker__quarter-text--selected, .react-datepicker__quarter-text--in-selecting-range, .react-datepicker__quarter-text--in-range, .react-datepicker__year-text--selected, .react-datepicker__year-text--in-selecting-range, .react-datepicker__year-text--in-range {
+  background-color: var(--accent-color) !important;
+}
+
+/* Custom Day Classes for Watchlist */
+.booked-date {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  color: #fca5a5 !important;
+  text-decoration: line-through;
+}
+.free-date {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+  color: #6ee7b7 !important;
+}

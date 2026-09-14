@@ -30,6 +30,7 @@ export default function FilterBar({
           <button className={viewMode === 'map' ? 'active' : ''} onClick={() => setViewMode('map')}>🗺️ Kort</button>
           <button className={viewMode === 'matrix' ? 'active' : ''} onClick={() => setViewMode('matrix')}>📊 Kalender</button>
           <button className={viewMode === 'weekends' ? 'active' : ''} onClick={() => setViewMode('weekends')}>🏕️ Weekender</button>
+          <button className={viewMode === 'stats' ? 'active' : ''} onClick={() => setViewMode('stats')}>📈 Statistik</button>
         </div>
 
         {viewMode === 'map' ? (
@@ -46,7 +47,7 @@ export default function FilterBar({
               <button className="clear-btn" onClick={() => { setFilterStart(''); setFilterEnd(''); }}>Nulstil</button>
             )}
           </div>
-        ) : viewMode !== 'home' ? (
+        ) : (viewMode !== 'home' && viewMode !== 'stats') ? (
           <form className="location-filter" onSubmit={handleLocationSearch}>
             <div className="filter-input-group relative-input">
               <input 
@@ -70,6 +71,7 @@ export default function FilterBar({
       </div>
       <div className="mode-help-text">
          {viewMode === 'home' && "🏠 Velkommen til Landjord Overblik. Brug fanebladene ovenfor til at finde ledige pladser."}
+         {viewMode === 'stats' && "📈 Følg med i populariteten og se hvilke pladser der er mest rift om, samt udviklingen i belægningsgrad over tid."}
          {viewMode === 'map' && "📍 Geografisk overblik: Perfekt når du kender dine eksakte rejsedatoer og hurtigt vil se de ledige muligheder på et Danmarkskort."}
          {viewMode === 'matrix' && "📊 Det store puslespil: Ideelt til den fleksible tur. Få overblikket over alle pladsernes ledige 'huller', så du nemt kan matche dem med dine fridage."}
          {viewMode === 'weekends' && "🏕️ Hurtig getaway: Skræddersyet til weekendture. Vi har samlet de næste 8 weekender, så du lynhurtigt kan se præcis hvilke pladser der er ledige fra fredag til søndag."}

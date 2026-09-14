@@ -4,3 +4,4 @@ playwright==1.44.0
 pytest
 pytest-asyncio
 httpx
+dnspython

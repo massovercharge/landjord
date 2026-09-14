@@ -9,8 +9,12 @@ from db import init_db
 
 init_db()
 
-# Mock the cache so we don't have to wait for Playwright in tests
-main.cached_full_sites = [{"slug": "test-site", "name": "Test Site", "popularity_score": "hot"}]
+# Mock the cache and trigger_fetch so we don't have to wait for Playwright in tests
+async def mock_trigger_fetch():
+    pass
+
+main.trigger_fetch = mock_trigger_fetch
+main.cached_full_sites = main.db.get_seeded_full_sites()
 main.data_ready_event.set()
 
 client = TestClient(main.app)
@@ -21,4 +25,6 @@ def test_read_sites_full():
     data = response.json()
     assert "sites" in data
     assert isinstance(data["sites"], list)
-    assert data["sites"][0]["popularity_score"] == "hot"
+    slugs = [s["slug"] for s in data["sites"]]
+    assert "ostervang-plads" in slugs
+    assert "fynslund-plads" in slugs
