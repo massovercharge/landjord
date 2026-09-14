@@ -284,9 +284,9 @@ async def get_booking_trends(site_slug: str = "all"):
             target = datetime.strptime(target_str, "%Y-%m-%d").date()
             obs = datetime.fromisoformat(obs_str).date()
             diff_days = (target - obs).days
-            
+            # Hvis en observation peger tilbage i tid, ignoreres den
             if diff_days < 0:
-                diff_days = 0
+                continue
                 
             if diff_days <= 2:
                 buckets["0-2 dage før"] += 1

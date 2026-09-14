@@ -156,6 +156,7 @@ def save_snapshot(site_slug, occupied_dates):
     row = c.fetchone()
     
     old_dates = set()
+    is_initial_baseline = (row is None)
     if row:
         try:
             old_dates = set(json.loads(row[0]))
@@ -167,18 +168,24 @@ def save_snapshot(site_slug, occupied_dates):
     now_iso = datetime.now().isoformat()
     
     # 2. Beregn diffs og indsæt i ledger (Kun ægte ændringer logges)
-    # Bookings: Datoer der er i new_dates, men ikke var i old_dates
-    booked_dates = new_dates - old_dates
-    for d in booked_dates:
-        c.execute("INSERT INTO booking_ledger (site_slug, target_date, observed_at, event_type) VALUES (?, ?, ?, ?)", (site_slug, d, now_iso, 'booked'))
-        
-    # Cancellations: Datoer der var i old_dates, IKKE er i new_dates, OG er >= i dag
-    cancelled_dates = {d for d in old_dates if d not in new_dates and d >= today_str}
-    for d in cancelled_dates:
-        c.execute("INSERT INTO booking_ledger (site_slug, target_date, observed_at, event_type) VALUES (?, ?, ?, ?)", (site_slug, d, now_iso, 'cancelled'))
-        
-    # 3. Beregn endeligt snapshot: Behold ALLE gamle datoer for historik, minus aflysninger.
-    final_dates = (old_dates.union(new_dates)) - cancelled_dates
+    # VIGTIGT: Første gang vi observerer en plads (row is None), er alle eksisterende bookinger
+    # lavet før overvågningen startede. De må IKKE logges i ledgeren, da det forvansker
+    # statistikken over, hvor lang tid i forvejen der bookes.
+    cancelled_dates = set()
+    if not is_initial_baseline:
+        # Bookings: Datoer der er i new_dates, men ikke var i old_dates, OG er >= i dag
+        booked_dates = {d for d in (new_dates - old_dates) if d >= today_str}
+        for d in booked_dates:
+            c.execute("INSERT INTO booking_ledger (site_slug, target_date, observed_at, event_type) VALUES (?, ?, ?, ?)", (site_slug, d, now_iso, 'booked'))
+            
+        # Cancellations: Datoer der var i old_dates, IKKE er i new_dates, OG er >= i dag
+        cancelled_dates = {d for d in old_dates if d not in new_dates and d >= today_str}
+        for d in cancelled_dates:
+            c.execute("INSERT INTO booking_ledger (site_slug, target_date, observed_at, event_type) VALUES (?, ?, ?, ?)", (site_slug, d, now_iso, 'cancelled'))
+            
+        final_dates = (old_dates.union(new_dates)) - cancelled_dates
+    else:
+        final_dates = new_dates
     
     c.execute(
         "INSERT OR REPLACE INTO availability_snapshots (site_slug, date_checked, occupied_dates) VALUES (?, ?, ?)",

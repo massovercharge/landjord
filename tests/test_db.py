@@ -83,3 +83,32 @@ def test_get_seeded_full_sites():
     assert fynslund["longitude"] == 9.338100
     assert "supermarket" in fynslund["pois"]
 
+def test_booking_ledger_baseline_and_delta():
+    from datetime import datetime, timedelta
+    slug = "ledger-test-site"
+    today = datetime.now()
+    d1 = (today + timedelta(days=5)).strftime("%Y-%m-%d")
+    d2 = (today + timedelta(days=6)).strftime("%Y-%m-%d")
+    d3 = (today + timedelta(days=10)).strftime("%Y-%m-%d")
+
+    # 1. Initial snapshot: must NOT populate booking_ledger
+    db.save_snapshot(slug, [d1, d2])
+    
+    conn = sqlite3.connect(TEST_DB)
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM booking_ledger WHERE site_slug = ?", (slug,))
+    count_initial = c.fetchone()[0]
+    assert count_initial == 0, "Initial snapshot should not log to booking_ledger"
+
+    # 2. Subsequent snapshot: adding d3 and removing d1
+    db.save_snapshot(slug, [d2, d3])
+    
+    c.execute("SELECT target_date, event_type FROM booking_ledger WHERE site_slug = ? ORDER BY id ASC", (slug,))
+    events = c.fetchall()
+    conn.close()
+
+    assert len(events) == 2
+    assert (d3, "booked") in events
+    assert (d1, "cancelled") in events
+
+

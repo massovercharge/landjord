@@ -429,26 +429,33 @@ export default function StatsView({ sites }) {
             </div>
           )}
           {/* Chart 4: Booking Horizon (Nyt Ledger-system) */}
-          {trends && trends.total > 0 && (
-            <div className="chart-card">
-              <h3>Hvor længe i forvejen bookes der?</h3>
-              <p className="chart-desc">Baseret på {trends.total} historiske bookinger for det valgte område.</p>
-              <div className="chart-wrapper">
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={trends.trends} margin={{ top: 10, right: 10, left: isMobile ? -30 : -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                    <XAxis dataKey="name" stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} />
-                    <YAxis stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} width={isMobile ? 30 : 40} />
-                    <Tooltip 
-                      contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
-                      formatter={(value, name, props) => [`${value} bookinger (${props.payload.percentage}%)`, 'Antal']}
-                    />
-                    <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          )}
+          <div className="chart-card">
+            <h3>Hvor længe i forvejen bookes der?</h3>
+            {trends && trends.total > 0 ? (
+              <>
+                <p className="chart-desc">Baseret på {trends.total} nye observationer af bookinger i forhold til baseline.</p>
+                <div className="chart-wrapper">
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={trends.trends} margin={{ top: 10, right: 10, left: isMobile ? -30 : -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
+                      <XAxis dataKey="name" stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} />
+                      <YAxis stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} width={isMobile ? 30 : 40} />
+                      <Tooltip 
+                        contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                        formatter={(value, name, props) => [`${value} bookinger (${props.payload.percentage}%)`, 'Antal']}
+                      />
+                      <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </>
+            ) : (
+              <p className="chart-desc" style={{fontStyle: 'normal', color: '#94a3b8', padding: '8px 0', lineHeight: 1.5}}>
+                ⏱️ <em>Indsamler løbende data over nye reservationer...</em><br/>
+                For at undgå misvisende tal medregnes eksisterende bookinger ikke i booking-horisonten. Grafen opbygges automatisk i takt med, at systemet observerer nye bookinger ved de kommende scraping-tjek.
+              </p>
+            )}
+          </div>
 
         </div>
       </div>
