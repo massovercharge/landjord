@@ -31,3 +31,34 @@
 ## Opsamling og Bedste Praksis (KI / AI)
 - **"God" Documentation:** Sørg altid for at opdatere dokumentationen når større arkitektoniske refaktoreringer udføres. Testsuites bør forklares klart i README.
 - **Race conditions:** Undgå altid at udsætte stateful objekter (som en Playwright browser page) for usynkrone multi-user inputs via FastAPI endpoints. Cache/proxy mønsteret med adskilt worker/API er nu etableret.
+
+## Handover: Mobil UX & Real Estate Optimering
+
+### 1. Nuværende Status (Commit 5536c60)
+- Alt nyt kode er testet (`pytest`, `vitest`, `npm run build`) og pushet til `origin/main`.
+- Inkluderer: `StatsView.jsx` (Recharts overblik), `EditAlertView.jsx` (e-mail alerts), `mailer.py`, database snapshots & popularitetsanalyse, POI beregning (bus/supermarked).
+
+### 2. Gennemført Mobil UX Review (Flaskehalse & Løsninger)
+Følgende forbedringer skal implementeres for at maksimere skærmplads (real estate) og mobiloplevelsen (375px - 412px viewports):
+1. **Bundnavigation (Bottom Navigation Bar) på mobil:**
+   - Flyt fanebladene (`Forside`, `Kort`, `Kalender`, `Weekender`, `Statistik`) fra top-headeren til en fast, ergonomisk bundbar på mobil (`@media (max-width: 768px)`).
+   - Frigør 150-250px vertikal skærmplads i toppen.
+2. **Kompakt Top Header:**
+   - Reducer headerhøjde drastisk på mobil.
+   - Skjul `.mode-help-text` (eller gør til et lille modal-info-ikon).
+   - Placer datovælgere/by-søgning som kompakte chips eller en collapsible skuffe.
+3. **Maksimal Skærmudnyttelse (Margin & Padding):**
+   - `.view-container` har `padding: 2rem` (stjæler ~17% af bredden på mobil). Reducer til `0.5rem - 0.75rem` (8-12px) under 768px.
+4. **Kortvisning (MapView):**
+   - Kortet skal udfylde 100% af den resterende skærmhøjde uden at være klemt af store filtre.
+5. **Kalender/Matrix (MatrixView):**
+   - Fjern desktop-referencer ("Hold musen over...").
+   - Juster sticky kolonne og touch-target størrelse for dato-celler.
+6. **Weekends- & Statistik-visning:**
+   - Touch-venlig skift mellem kort og billede på mobil for weekend-kort.
+   - Sikr at Recharts grafer i StatsView ikke afskærer akser på mobilbredder.
+
+### 3. Bemærkning om browser-test i AI-miljøet
+- Antigravity browser-subagenten fejler pga. en upstream CDN 404 for Playwright linux-driver v1.57.0.
+- Mobilvisning testes og verificeres derfor mest pålideligt direkte via brugerens lokale Chrome DevTools (Device Emulation / iPhone / Android mode) eller ved kørsel mod lokal dev-server (`localhost:5173`).
+
