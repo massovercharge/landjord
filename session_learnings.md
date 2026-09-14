@@ -62,3 +62,20 @@ Følgende forbedringer skal implementeres for at maksimere skærmplads (real est
 - Antigravity browser-subagenten fejler pga. en upstream CDN 404 for Playwright linux-driver v1.57.0.
 - Mobilvisning testes og verificeres derfor mest pålideligt direkte via brugerens lokale Chrome DevTools (Device Emulation / iPhone / Android mode) eller ved kørsel mod lokal dev-server (`localhost:5173`).
 
+### 4. Gennemført Implementering af Mobil UX
+- **Bundnavigation:** `BottomNav.jsx` og `BottomNav.test.jsx` implementeret med iOS safe-area support og active states.
+- **Header:** `.mode-help-text` skjules på mobil for at frigøre 50-80px, logo og filtre strømlinet til kompakte enkeltlinje-rækker.
+- **Skærmudnyttelse:** `.view-container` padding reduceret til 8-12px på mobil; bund-padding respekterer bundbaren.
+- **Kortvisning:** Udfylder 100% af resterende viewport med touch-optimerede popups.
+- **Matrix:** Faste touch-targets (32x38px) på mobil og enhedsuafhængige tips.
+- **Weekender & Statistik:** Touch-venlig flip mellem kort og billede via badge og `toggleSiteMedia`; Recharts responsive akser og afkortede labels forhindrer afskæring.
+- Alle testsuites bestået: Vitest (11/11), Pytest (5/5), Vite production build.
+
+### 5. Cloudflare Tunnel & Domæne Opsætning (`https://landjord.aegaarden.dk`)
+- **Årsag til oprindelig fejl:** Cloudflare Tunnel pegede med HTTP mod `http://192.168.50.5:5821`, men `docker-compose.yml` mapped port 5821 til containerens port 443 (SSL). Nginx afviste derfor med `400 The plain HTTP request was sent to HTTPS port`.
+- **Løsning:** 
+  - Portmapping i `docker-compose.yml` ændret fra `5821:443` til `5821:80` (HTTP).
+  - Nginx modtager nu ukrypteret HTTP fra Cloudflare Tunnel, mens Cloudflare håndterer det gyldige offentlige SSL-certifikat overfor klienterne på `https://landjord.aegaarden.dk/`.
+  - `main.py` er opdateret med `BASE_URL` (standard: `https://landjord.aegaarden.dk`), så alle links i e-mail-notifikationer virker overalt i verden.
+  - `deploy.sh` har fået tilføjet `--exclude '.env'` til `rsync` for at forhindre utilsigtet sletning af serverens `.env`-fil.
+

@@ -17,6 +17,6 @@ services:
     container_name: landjord-frontend
     restart: unless-stopped
     ports:
-      - "5821:443"
+      - "5821:80"
     depends_on:
       - backend

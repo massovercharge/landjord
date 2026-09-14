@@ -6,9 +6,14 @@ export default function WeekendsView({ sites, getImageUrl, goToBooking, enableEx
   const [weekendMode, setWeekendMode] = useState('fri-sun');
   const [expandedWeekends, setExpandedWeekends] = useState({});
   const [hoveredSiteKey, setHoveredSiteKey] = useState(null);
+  const [toggledSiteKeys, setToggledSiteKeys] = useState({});
 
   const toggleWeekendExpanded = (startStr) => {
     setExpandedWeekends(prev => ({...prev, [startStr]: !prev[startStr]}));
+  };
+
+  const toggleSiteMedia = (siteKey) => {
+    setToggledSiteKeys(prev => ({ ...prev, [siteKey]: !prev[siteKey] }));
   };
 
   const weekends = useMemo(() => {
@@ -58,7 +63,7 @@ export default function WeekendsView({ sites, getImageUrl, goToBooking, enableEx
     <div className="view-container weekends-view">
       <div className="view-header">
          <h2>Ledige Weekender</h2>
-         <p><strong>Tip:</strong> Hold musen over et billede af en plads for at se et kort med pladsens præcise lokation.</p>
+         <p><strong>Tip:</strong> Tryk på et billede (eller hold musen over på pc) for at se pladsens lokation på kort.</p>
          <div className="weekend-mode-selector">
            <button className={weekendMode === 'fri-sun' ? 'active' : ''} onClick={() => setWeekendMode('fri-sun')}>Fre-Søn</button>
            <button className={weekendMode === 'fri-sat' ? 'active' : ''} onClick={() => setWeekendMode('fri-sat')}>Fre-Lør (1 nat)</button>
@@ -81,6 +86,7 @@ export default function WeekendsView({ sites, getImageUrl, goToBooking, enableEx
                 <div className="weekend-sites-grid">
                    {availableSites.slice(0, expandedWeekends[wknd.start] ? availableSites.length : 6).map(site => {
                       const siteKey = `${wknd.start}-${site.slug}`;
+                      const showMap = (!enableExternalImages) || (hoveredSiteKey === siteKey) || (!!toggledSiteKeys[siteKey]);
                       return (
                          <div 
                            className="weekend-site" 
@@ -88,11 +94,23 @@ export default function WeekendsView({ sites, getImageUrl, goToBooking, enableEx
                            onMouseEnter={() => setHoveredSiteKey(siteKey)}
                            onMouseLeave={() => setHoveredSiteKey(null)}
                          >
-                            <div className="bg-media-container">
+                            <div 
+                              className="bg-media-container"
+                              onClick={() => toggleSiteMedia(siteKey)}
+                              role="button"
+                              tabIndex={0}
+                              title="Tryk for at skifte mellem billede og kort"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  toggleSiteMedia(siteKey);
+                                }
+                              }}
+                            >
                                {enableExternalImages && (
-                                  <div className={`bg-img ${hoveredSiteKey === siteKey ? 'hidden' : ''}`} style={getImageUrl(site) ? {backgroundImage: `url(${getImageUrl(site)})`} : {background: '#334155'}}></div>
-                               )}
-                               {(!enableExternalImages || hoveredSiteKey === siteKey) && (
+                                  <div className={`bg-img ${showMap ? 'hidden' : ''}`} style={getImageUrl(site) ? {backgroundImage: `url(${getImageUrl(site)})`} : {background: '#334155'}}></div>
+                                )}
+                               {showMap && (
                                   <div className="bg-map">
                                      <MapContainer 
                                        center={[site.latitude, site.longitude]} 
@@ -108,6 +126,11 @@ export default function WeekendsView({ sites, getImageUrl, goToBooking, enableEx
                                         <Marker position={[site.latitude, site.longitude]} />
                                      </MapContainer>
                                   </div>
+                               )}
+                               {enableExternalImages && (
+                                 <span className="media-toggle-badge">
+                                   {showMap ? '📷 Foto' : '🗺️ Kort'}
+                                 </span>
                                )}
                             </div>
                             <div className="info">

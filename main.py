@@ -25,6 +25,7 @@ class AlertUpdate(BaseModel):
     min_days: int = 1
 
 ENABLE_TREND_ANALYSIS = os.getenv("ENABLE_TREND_ANALYSIS", "true").lower() == "true"
+BASE_URL = os.getenv("BASE_URL", "https://landjord.aegaarden.dk").rstrip("/")
 
 app = FastAPI(title="Landjord Overblik API Proxy")
 
@@ -137,8 +138,8 @@ async def fetch_data_task():
                 <p>Skynd dig ind og book på <a href="https://booking.landjord.com/sites/{t['site_slug']}">booking.landjord.com</a>.</p>
                 <hr>
                 <p style="font-size: 12px; color: #666;">
-                    Ønsker du at ændre din overvågning? <a href="https://192.168.50.5:5821/#edit-alert?token={t['token']}">Klik her for at redigere</a>.<br>
-                    Ønsker du slet ikke flere beskeder? <a href="https://192.168.50.5:5821/api/alerts/unsubscribe?token={t['token']}">Afmeld overvågning</a>.
+                    Ønsker du at ændre din overvågning? <a href="{BASE_URL}/#edit-alert?token={t['token']}">Klik her for at redigere</a>.<br>
+                    Ønsker du slet ikke flere beskeder? <a href="{BASE_URL}/api/alerts/unsubscribe?token={t['token']}">Afmeld overvågning</a>.
                 </p>
                 """
                 mailer.send_direct_email(t['email'], subject, html_content)
@@ -340,8 +341,8 @@ async def create_alert(alert: AlertCreate):
         <hr>
         <p style="font-size: 12px; color: #666;">
             <b>Vigtigt:</b> For at sikre, at vores notifikationer ikke havner i spam, bedes du tilføje <i>{sender_email}</i> til dine betroede afsendere eller faste kontakter.<br><br>
-            Har dine ferieplaner ændret sig? <a href="https://192.168.50.5:5821/#edit-alert?token={token}">Klik her for at redigere din overvågning</a>.<br>
-            Fortryder du? <a href="https://192.168.50.5:5821/api/alerts/unsubscribe?token={token}">Afmeld overvågning</a>.
+            Har dine ferieplaner ændret sig? <a href="{BASE_URL}/#edit-alert?token={token}">Klik her for at redigere din overvågning</a>.<br>
+            Fortryder du? <a href="{BASE_URL}/api/alerts/unsubscribe?token={token}">Afmeld overvågning</a>.
         </p>
         """
         mailer.send_direct_email(alert.email, subject, html_content)

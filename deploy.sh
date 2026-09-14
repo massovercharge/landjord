@@ -16,6 +16,7 @@ if [ "${1:-}" == "remote" ]; then
         --exclude '.pytest_cache' \
         --exclude '.git' \
         --exclude 'db.sqlite' \
+        --exclude '.env' \
         ./ $SERVER:$REMOTE_DIR/
         
     echo "📦 Bygger og starter containere på fjernserver..."
@@ -39,5 +40,5 @@ else
 fi
 
 echo "✅ Deployment færdig!"
-echo "➡️  Frontend kører på: https://localhost:5821 (Accepter selv-signeret certifikat i browseren)"
+echo "➡️  Frontend kører på: http://localhost:5821 eller https://landjord.aegaarden.dk"
 echo "➡️  Backend API proxy kører på: http://localhost:8000"

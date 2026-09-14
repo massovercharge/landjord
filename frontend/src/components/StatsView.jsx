@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -7,6 +7,15 @@ export default function StatsView({ sites }) {
   const [period, setPeriod] = useState(30);
   const [selectedSiteSlug, setSelectedSiteSlug] = useState('all');
   const [trends, setTrends] = useState(null);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 640);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 640);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const [showWatchlistModal, setShowWatchlistModal] = useState(false);
   const [watchlistForm, setWatchlistForm] = useState({
@@ -341,10 +350,16 @@ export default function StatsView({ sites }) {
                 </div>
               ) : (
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={historical} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <BarChart data={historical} margin={{ top: 10, right: 10, left: isMobile ? -30 : -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                    <XAxis dataKey="date" stroke="#94a3b8" tick={{fontSize: 12}} />
-                    <YAxis stroke="#94a3b8" />
+                    <XAxis 
+                      dataKey="date" 
+                      stroke="#94a3b8" 
+                      tick={{fontSize: isMobile ? 10 : 12}} 
+                      minTickGap={isMobile ? 15 : 10} 
+                      interval="preserveStartEnd" 
+                    />
+                    <YAxis stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} width={isMobile ? 30 : 40} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
                       formatter={(value) => [`${value} reservationer`, 'Efterspørgsel']}
@@ -362,10 +377,15 @@ export default function StatsView({ sites }) {
             <p className="chart-desc">Fordelingen af bookede nætter på ugens dage for den valgte periode.</p>
             <div className="chart-wrapper">
               <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={weekdays} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <BarChart data={weekdays} margin={{ top: 10, right: 10, left: isMobile ? -30 : -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                  <XAxis dataKey="name" stroke="#94a3b8" tick={{fontSize: 12}} />
-                  <YAxis stroke="#94a3b8" />
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#94a3b8" 
+                    tick={{fontSize: isMobile ? 10 : 12}} 
+                    tickFormatter={(name) => isMobile ? name.slice(0, 3) : name} 
+                  />
+                  <YAxis stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} width={isMobile ? 30 : 40} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
                     formatter={(value) => [`${value} reservationer`, 'Efterspørgsel']}
@@ -382,11 +402,22 @@ export default function StatsView({ sites }) {
               <h3>Mest populære pladser i {selectedSiteSlug === 'all' ? 'Danmark' : selectedSiteSlug.replace('region_', '').replace('sjaelland', 'Sjælland').replace('fyn', 'Fyn').replace('jylland', 'Jylland')} (Top 15)</h3>
               <p className="chart-desc">De pladser der har flest reservationer i de kommende {period} dage.</p>
               <div className="chart-wrapper">
-                <ResponsiveContainer width="100%" height={Math.max(300, topSites.length * 35)}>
-                  <BarChart data={topSites} layout="vertical" margin={{ top: 5, right: 30, left: 150, bottom: 5 }}>
+                <ResponsiveContainer width="100%" height={Math.max(300, topSites.length * (isMobile ? 30 : 35))}>
+                  <BarChart 
+                    data={topSites} 
+                    layout="vertical" 
+                    margin={{ top: 5, right: isMobile ? 15 : 30, left: isMobile ? 5 : 150, bottom: 5 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" horizontal={false} />
-                    <XAxis type="number" stroke="#94a3b8" />
-                    <YAxis dataKey="name" type="category" stroke="#94a3b8" width={140} tick={{fontSize: 12, fill: '#e2e8f0'}} />
+                    <XAxis type="number" stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} />
+                    <YAxis 
+                      dataKey="name" 
+                      type="category" 
+                      stroke="#94a3b8" 
+                      width={isMobile ? 95 : 140} 
+                      tick={{fontSize: isMobile ? 10 : 12, fill: '#e2e8f0'}} 
+                      tickFormatter={(name) => isMobile && name.length > 12 ? `${name.slice(0, 11)}…` : name}
+                    />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
                       formatter={(value) => [`${value} reservationer`, 'Efterspørgsel']}
@@ -404,10 +435,10 @@ export default function StatsView({ sites }) {
               <p className="chart-desc">Baseret på {trends.total} historiske bookinger for det valgte område.</p>
               <div className="chart-wrapper">
                 <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={trends.trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <BarChart data={trends.trends} margin={{ top: 10, right: 10, left: isMobile ? -30 : -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                    <XAxis dataKey="name" stroke="#94a3b8" tick={{fontSize: 12}} />
-                    <YAxis stroke="#94a3b8" />
+                    <XAxis dataKey="name" stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} />
+                    <YAxis stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} width={isMobile ? 30 : 40} />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
                       formatter={(value, name, props) => [`${value} bookinger (${props.payload.percentage}%)`, 'Antal']}

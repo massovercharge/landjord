@@ -21,8 +21,13 @@ export default function FilterBar({
     <header className="filter-bar">
       <div className="filter-content">
         <div className="logo">
-          <h1>Landjord Overblik (Uofficielt)</h1>
-          <button className="help-btn" onClick={onOpenHelp} title="Hjælp & Opslagsværk">❓ Hjælp</button>
+          <h1>
+            Landjord Overblik <span className="unofficial-tag">(Uofficielt)</span>
+          </h1>
+          <button className="help-btn" onClick={onOpenHelp} title="Hjælp & Opslagsværk" aria-label="Hjælp & Opslagsværk">
+            <span className="help-icon">❓</span>
+            <span className="help-label">Hjælp</span>
+          </button>
         </div>
         
         <div className="view-toggles">

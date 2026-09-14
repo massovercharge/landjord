@@ -12,6 +12,7 @@ import HelpModal from './components/HelpModal';
 import HomeView from './components/HomeView';
 import StatsView from './components/StatsView';
 import EditAlertView from './components/EditAlertView';
+import BottomNav from './components/BottomNav';
 
 import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -221,6 +222,7 @@ function App() {
           </>
         )}
       </main>
+      <BottomNav viewMode={viewMode} setViewMode={setViewMode} />
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
     </div>
   );
