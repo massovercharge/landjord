@@ -207,7 +207,7 @@ export default function StatsView({ sites, isUnlocked = false, unlockedKey = '',
     const weekdayNames = ["Søndag", "Mandag", "Tirsdag", "Onsdag", "Torsdag", "Fredag", "Lørdag"];
 
     dateRange.forEach(d => {
-      const dStr = d.toISOString().split('T')[0];
+      const dStr = formatDate(d);
       const displayDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
       historicalMap[dStr] = { dateStr: dStr, displayDate, reservations: 0, weekday: weekdayNames[d.getDay()], isWeekend: d.getDay() === 0 || d.getDay() === 6 };
     });
