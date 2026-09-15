@@ -1071,10 +1071,13 @@ body {
   justify-content: center;
   align-items: center;
   gap: 8px;
-  padding: 1.5rem 1rem 2rem 1rem;
+  padding: 3rem 1rem 1.5rem 1rem;
   font-size: 0.75rem;
   color: #64748b;
   text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: auto;
 }
 
 @media (max-width: 768px) {

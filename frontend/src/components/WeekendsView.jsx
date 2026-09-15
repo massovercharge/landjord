@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker } from 'react-leaflet';
 import { getLocalDateString } from '../utils/helpers';
+import AppFooter from './AppFooter';
 
-export default function WeekendsView({ sites, getImageUrl, goToBooking, enableExternalImages }) {
+export default function WeekendsView({ sites, getImageUrl, goToBooking, enableExternalImages, isUnlocked, onOpenUnlock }) {
   const [weekendMode, setWeekendMode] = useState('fri-sun');
   const [expandedWeekends, setExpandedWeekends] = useState({});
   const [hoveredSiteKey, setHoveredSiteKey] = useState(null);
@@ -166,6 +167,7 @@ export default function WeekendsView({ sites, getImageUrl, goToBooking, enableEx
           )
         })}
       </div>
+      <AppFooter isUnlocked={isUnlocked} onOpenUnlock={onOpenUnlock} />
     </div>
   );
 }

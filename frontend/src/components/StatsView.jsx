@@ -2,8 +2,9 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import AppFooter from './AppFooter';
 
-export default function StatsView({ sites, isUnlocked = false, unlockedKey = '' }) {
+export default function StatsView({ sites, isUnlocked = false, unlockedKey = '', onOpenUnlock }) {
   const [period, setPeriod] = useState(30);
   const [selectedSiteSlug, setSelectedSiteSlug] = useState('all');
   const [trends, setTrends] = useState(null);
@@ -466,6 +467,7 @@ export default function StatsView({ sites, isUnlocked = false, unlockedKey = '' 
           </div>
 
         </div>
+        <AppFooter isUnlocked={isUnlocked} onOpenUnlock={onOpenUnlock} />
       </div>
     </div>
   );

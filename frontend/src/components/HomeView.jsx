@@ -1,6 +1,7 @@
 import React from 'react';
+import AppFooter from './AppFooter';
 
-export default function HomeView({ sites, setViewMode }) {
+export default function HomeView({ sites, setViewMode, isUnlocked, onOpenUnlock }) {
   const totalSites = sites.length;
   const hotSites = sites.filter(s => s.popularity_score === 'hot').length;
   const mediumSites = sites.filter(s => s.popularity_score === 'medium').length;
@@ -54,6 +55,7 @@ export default function HomeView({ sites, setViewMode }) {
           </div>
         </div>
         </div>
+        <AppFooter isUnlocked={isUnlocked} onOpenUnlock={onOpenUnlock} />
       </div>
     </div>
   );

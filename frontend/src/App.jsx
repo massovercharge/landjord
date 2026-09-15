@@ -204,10 +204,20 @@ function App() {
         ) : (
           <>
             {viewMode === 'home' && (
-              <HomeView sites={sites} setViewMode={setViewMode} />
+              <HomeView 
+                sites={sites} 
+                setViewMode={setViewMode} 
+                isUnlocked={isUnlocked} 
+                onOpenUnlock={() => setIsUnlockModalOpen(true)} 
+              />
             )}
             {viewMode === 'stats' && (
-              <StatsView sites={sites} isUnlocked={isUnlocked} unlockedKey={unlockedKey} />
+              <StatsView 
+                sites={sites} 
+                isUnlocked={isUnlocked} 
+                unlockedKey={unlockedKey} 
+                onOpenUnlock={() => setIsUnlockModalOpen(true)} 
+              />
             )}
             {viewMode === 'map' && (
               <MapView 
@@ -222,6 +232,8 @@ function App() {
                 sites={filteredAndSortedSites} 
                 getImageUrl={getImageUrl} 
                 goToBooking={goToBooking} 
+                isUnlocked={isUnlocked} 
+                onOpenUnlock={() => setIsUnlockModalOpen(true)} 
               />
             )}
             {viewMode === 'weekends' && (
@@ -229,26 +241,20 @@ function App() {
                 sites={filteredAndSortedSites} 
                 getImageUrl={getImageUrl} 
                 goToBooking={goToBooking} 
-                enableExternalImages={ENABLE_EXTERNAL_IMAGES}
+                enableExternalImages={ENABLE_EXTERNAL_IMAGES} 
+                isUnlocked={isUnlocked} 
+                onOpenUnlock={() => setIsUnlockModalOpen(true)} 
               />
             )}
             {viewMode === 'edit-alert' && (
-              <EditAlertView />
+              <EditAlertView 
+                isUnlocked={isUnlocked} 
+                onOpenUnlock={() => setIsUnlockModalOpen(true)} 
+              />
             )}
           </>
         )}
       </main>
-      <footer className="app-footer">
-        <span>Landjord Overblik (Uofficielt)</span>
-        <button 
-          type="button" 
-          className="discreet-lock-btn" 
-          onClick={() => setIsUnlockModalOpen(true)}
-          aria-label="Adgang"
-        >
-          {isUnlocked ? '🔓' : '🔒'}
-        </button>
-      </footer>
       <BottomNav viewMode={viewMode} setViewMode={setViewMode} />
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
       <UnlockModal 

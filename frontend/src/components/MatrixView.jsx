@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { getISOWeek, getLocalDateString, getDanishHoliday } from '../utils/helpers';
+import AppFooter from './AppFooter';
 
-export default function MatrixView({ sites, getImageUrl, goToBooking }) {
+export default function MatrixView({ sites, getImageUrl, goToBooking, isUnlocked, onOpenUnlock }) {
   const [matrixHoverImg, setMatrixHoverImg] = useState(null);
   const [daysCount, setDaysCount] = useState(90);
 
@@ -122,6 +123,7 @@ export default function MatrixView({ sites, getImageUrl, goToBooking }) {
              <img src={matrixHoverImg.url} alt="Plads preview" />
           </div>
        )}
+       <AppFooter isUnlocked={isUnlocked} onOpenUnlock={onOpenUnlock} />
      </div>
   );
 }

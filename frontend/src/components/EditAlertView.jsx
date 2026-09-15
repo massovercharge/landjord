@@ -3,9 +3,10 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from 'react-datepicker';
 import da from 'date-fns/locale/da';
+import AppFooter from './AppFooter';
 registerLocale('da', da);
 
-const EditAlertView = () => {
+const EditAlertView = ({ isUnlocked, onOpenUnlock }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [status, setStatus] = useState(null);
@@ -170,6 +171,7 @@ const EditAlertView = () => {
                     </a>
                 </form>
             )}
+            <AppFooter isUnlocked={isUnlocked} onOpenUnlock={onOpenUnlock} />
         </div>
     );
 };
