@@ -128,7 +128,7 @@ export default function StatsView({ sites }) {
                             <div className="radio-group" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
                                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                                     <input type="radio" name="match_type" value="all" checked={watchlistForm.match_type === 'all'} onChange={() => setWatchlistForm({...watchlistForm, match_type: 'all'})} />
-                                    Hele perioden skal være ledig
+                                    Hele perioden bliver ledig
                                 </label>
                                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                                     <input type="radio" name="match_type" value="any" checked={watchlistForm.match_type === 'any'} onChange={() => setWatchlistForm({...watchlistForm, match_type: 'any'})} />
@@ -137,7 +137,7 @@ export default function StatsView({ sites }) {
                                       if (val > periodDays) val = periodDays;
                                       if (val < 1) val = 1;
                                       setWatchlistForm({...watchlistForm, min_days: val, match_type: 'any'});
-                                    }} onClick={(e) => setWatchlistForm({...watchlistForm, match_type: 'any'})} style={{ width: '60px', padding: '2px 5px', backgroundColor: 'var(--bg-color)', border: '1px solid var(--card-border)', color: 'white', borderRadius: '4px' }} /> sammenhængende dage er ledige
+                                    }} onClick={(e) => setWatchlistForm({...watchlistForm, match_type: 'any'})} style={{ width: '60px', padding: '2px 5px', backgroundColor: 'var(--bg-color)', border: '1px solid var(--card-border)', color: 'white', borderRadius: '4px' }} /> sammenhængende dage bliver ledige
                                 </label>
                             </div>
                         </div>

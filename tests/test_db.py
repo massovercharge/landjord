@@ -111,4 +111,81 @@ def test_booking_ledger_baseline_and_delta():
     assert (d3, "booked") in events
     assert (d1, "cancelled") in events
 
+def test_alert_triggers_when_dates_become_free():
+    from datetime import datetime, timedelta
+    slug = "alert-test-site"
+    today = datetime.now()
+    d1 = (today + timedelta(days=10)).strftime("%Y-%m-%d")
+    d2 = (today + timedelta(days=11)).strftime("%Y-%m-%d")
+    d3 = (today + timedelta(days=12)).strftime("%Y-%m-%d")
+    
+    # Dag 1, 2, 3 er oprindeligt optaget
+    db.save_snapshot(slug, [d1, d2, d3])
+    
+    # Opret alert for d1 til d3 (kræver min 2 sammenhængende dage)
+    token = db.create_alert(
+        email="camper@example.com",
+        site_slug=slug,
+        start_date=d1,
+        end_date=d3,
+        match_type="any",
+        min_days=2
+    )
+    
+    # Tjek alerts før nogen afbestilling: bør IKKE trigge
+    triggered = db.check_and_trigger_alerts()
+    assert len(triggered) == 0
+    
+    # 1. Kun d1 bliver afbestilt (kun 1 dag frigivet, min_days er 2)
+    db.save_snapshot(slug, [d2, d3])
+    triggered = db.check_and_trigger_alerts()
+    assert len(triggered) == 0, "Skal ikke trigge når der kun er 1 frigivet dag og min_days er 2"
+    
+    # 2. d2 bliver også afbestilt (nu er d1 og d2 ledige sammenhængende, 2 dage)
+    db.save_snapshot(slug, [d3])
+    triggered = db.check_and_trigger_alerts()
+    assert len(triggered) == 1, "Skal trigge nu hvor 2 sammenhængende dage er blevet ledige"
+    assert triggered[0]["token"] == token
+    assert d2 in triggered[0]["freed_dates"]
+    assert len(triggered[0]["matching_blocks"]) == 1
+    assert triggered[0]["matching_blocks"][0]["count"] == 2
+    assert triggered[0]["matching_blocks"][0]["start"] == d1
+    assert triggered[0]["matching_blocks"][0]["end"] == d2
+    
+    # 3. Næste tjek uden ændringer: må IKKE trigge igen (ingen nye dage blev ledige)
+    triggered_again = db.check_and_trigger_alerts()
+    assert len(triggered_again) == 0
+
+def test_alert_match_type_all_triggers_only_when_fully_freed():
+    from datetime import datetime, timedelta
+    slug = "all-test-site"
+    today = datetime.now()
+    d1 = (today + timedelta(days=20)).strftime("%Y-%m-%d")
+    d2 = (today + timedelta(days=21)).strftime("%Y-%m-%d")
+    
+    db.save_snapshot(slug, [d1, d2])
+    
+    token = db.create_alert(
+        email="family@example.com",
+        site_slug=slug,
+        start_date=d1,
+        end_date=d2,
+        match_type="all",
+        min_days=1
+    )
+    
+    # Delvis frigivelse: kun d1 frigives
+    db.save_snapshot(slug, [d2])
+    triggered = db.check_and_trigger_alerts()
+    assert len(triggered) == 0, "Bør ikke trigge for match_type='all' når kun halvdelen er ledig"
+    
+    # Fuld frigivelse: d2 frigives også
+    db.save_snapshot(slug, [])
+    triggered = db.check_and_trigger_alerts()
+    assert len(triggered) == 1
+    assert triggered[0]["token"] == token
+    assert d2 in triggered[0]["freed_dates"]
+    assert triggered[0]["matching_blocks"][0]["count"] == 2
+
+
 

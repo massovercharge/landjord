@@ -6,9 +6,51 @@ import json
 import asyncio
 import traceback
 import os
+from datetime import datetime, timedelta
 import db
 import mailer
 from pydantic import BaseModel
+
+DANISH_MONTHS = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"]
+DANISH_WEEKDAYS = ["mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag"]
+
+def format_danish_date(d_str: str, include_weekday: bool = True) -> str:
+    """Formatterer YYYY-MM-DD til f.eks. 'Fredag d. 18. juli'"""
+    try:
+        dt = datetime.strptime(d_str, "%Y-%m-%d").date()
+        month = DANISH_MONTHS[dt.month - 1]
+        if include_weekday:
+            weekday = DANISH_WEEKDAYS[dt.weekday()].capitalize()
+            return f"{weekday} d. {dt.day}. {month}"
+        return f"{dt.day}. {month}"
+    except Exception:
+        return d_str
+
+def format_danish_range(start_str: str, end_str: str) -> str:
+    """Formatterer to datoer pænt på dansk, f.eks. '18. - 20. juli' eller '30. juni - 2. juli'"""
+    try:
+        d_start = datetime.strptime(start_str, "%Y-%m-%d").date()
+        d_end = datetime.strptime(end_str, "%Y-%m-%d").date()
+        m_start = DANISH_MONTHS[d_start.month - 1]
+        m_end = DANISH_MONTHS[d_end.month - 1]
+        
+        if d_start == d_end:
+            return f"{d_start.day}. {m_start}"
+        if m_start == m_end and d_start.year == d_end.year:
+            return f"{d_start.day}. - {d_end.day}. {m_start}"
+        return f"{d_start.day}. {m_start} - {d_end.day}. {m_end}"
+    except Exception:
+        return f"{start_str} - {end_str}"
+
+def get_site_display_name(site_slug: str) -> str:
+    global cached_full_sites
+    for s in cached_full_sites:
+        if s.get('slug') == site_slug:
+            return s.get('name', site_slug)
+    for s in db.KNOWN_SITES:
+        if s.get('slug') == site_slug:
+            return s.get('name', site_slug)
+    return site_slug.replace('-', ' ').title()
 
 class AlertCreate(BaseModel):
     email: str
@@ -126,21 +168,73 @@ async def fetch_data_task():
             if triggered:
                 print(f"Fandt {len(triggered)} alerts der skal udløses!")
             for t in triggered:
-                # MOCK PRINT
-                print(f"MOCK EMAIL: Sender besked til {t['email']} om at {t['site_slug']} er ledig ({t['start_date']} til {t['end_date']}).")
+                site_name = get_site_display_name(t['site_slug'])
+                freed_dates = t.get('freed_dates', [])
+                matching_blocks = t.get('matching_blocks', [])
                 
-                # ACTUAL EMAIL
-                subject = f"Plads ledig på {t['site_slug']}!"
+                # Formatter emnefelt og frigivne datoer
+                if len(freed_dates) == 1:
+                    d_formatted = format_danish_date(freed_dates[0])
+                    subject = f"🔔 {d_formatted} er netop blevet ledig på {site_name}!"
+                    freed_list_html = f"<li style='margin-bottom: 4px;'>{d_formatted}</li>"
+                else:
+                    subject = f"🔔 {len(freed_dates)} datoer er netop blevet ledige på {site_name}!"
+                    freed_list_html = "".join(f"<li style='margin-bottom: 4px;'>{format_danish_date(d)}</li>" for d in freed_dates)
+                
+                # Opsummering af sammenhængende blokke
+                blocks_html = ""
+                if matching_blocks:
+                    block_items = []
+                    for b in matching_blocks:
+                        range_str = format_danish_range(b['start'], b['end'])
+                        days_count = b['count']
+                        day_word = "dag" if days_count == 1 else "sammenhængende dage"
+                        block_items.append(f"<li style='margin-bottom: 4px;'><b>{range_str}</b> ({days_count} {day_word})</li>")
+                    
+                    blocks_html = f"""
+                    <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 14px 16px; margin: 16px 0;">
+                        <h4 style="margin: 0 0 8px 0; color: #1e40af; font-size: 14px;">🏕️ Sammenhængende ledig periode:</h4>
+                        <ul style="margin: 0; padding-left: 20px; color: #1e3a8a;">
+                            {''.join(block_items)}
+                        </ul>
+                    </div>
+                    """
+                
+                cond_text = "Hele perioden bliver ledig" if t.get('match_type') == 'all' else f"Min. {t.get('min_days', 1)} sammenhængende dage bliver ledige"
+                
+                print(f"EMAIL NOTIFIKATION: Sender til {t['email']} for {t['site_slug']} (Frigivne datoer: {freed_dates})")
+                
                 html_content = f"""
-                <h2>God nyhed! Der er ledige pladser!</h2>
-                <p>Din overvågning for <b>{t['site_slug']}</b> har fundet ledige datoer i din ønskede periode ({t['start_date']} - {t['end_date']}).</p>
-                <br>
-                <p>Skynd dig ind og book på <a href="https://booking.landjord.com/sites/{t['site_slug']}">booking.landjord.com</a>.</p>
-                <hr>
-                <p style="font-size: 12px; color: #666;">
-                    Ønsker du at ændre din overvågning? <a href="{BASE_URL}/#edit-alert?token={t['token']}">Klik her for at redigere</a>.<br>
-                    Ønsker du slet ikke flere beskeder? <a href="{BASE_URL}/api/alerts/unsubscribe?token={t['token']}">Afmeld overvågning</a>.
-                </p>
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b; line-height: 1.6;">
+                    <h2 style="color: #059669; margin-bottom: 12px;">God nyhed! Der er blevet plads 🏕️</h2>
+                    <p style="font-size: 16px; margin-top: 0;">
+                        Der er sket en afbestilling eller ændring på <b>{site_name}</b>, så der nu er ledigt i din overvågede periode:
+                    </p>
+                    
+                    <div style="background-color: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 14px 16px; margin: 16px 0;">
+                        <h4 style="margin: 0 0 8px 0; color: #065f46; font-size: 14px;">📅 Netop frigivne dato(er):</h4>
+                        <ul style="margin: 0; padding-left: 20px; color: #047857; font-weight: 600;">
+                            {freed_list_html}
+                        </ul>
+                    </div>
+                    
+                    {blocks_html}
+                    
+                    <div style="text-align: center; margin: 26px 0;">
+                        <a href="https://booking.landjord.com/sites/{t['site_slug']}" style="display: inline-block; background-color: #2563eb; color: #ffffff; padding: 12px 24px; font-weight: bold; text-decoration: none; border-radius: 8px;">
+                            Gå til booking på booking.landjord.com →
+                        </a>
+                    </div>
+                    
+                    <p style="font-size: 13px; color: #64748b; margin-top: 24px;">
+                        Din overvågning dækker perioden <b>{format_danish_range(t['start_date'], t['end_date'])}</b> ({cond_text}).
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+                    <p style="font-size: 12px; color: #94a3b8;">
+                        Vil du tilpasse perioden? <a href="{BASE_URL}/#edit-alert?token={t['token']}" style="color: #2563eb;">Rediger overvågning</a>.<br>
+                        Vil du slet ikke modtage flere beskeder? <a href="{BASE_URL}/api/alerts/unsubscribe?token={t['token']}" style="color: #ef4444;">Afmeld overvågning</a>.
+                    </p>
+                </div>
                 """
                 mailer.send_direct_email(t['email'], subject, html_content)
             
@@ -327,23 +421,31 @@ async def create_alert(alert: AlertCreate):
         )
         
         # SEND CONFIRMATION EMAIL
-        subject = f"Overvågning oprettet for {alert.site_slug}"
+        site_name = get_site_display_name(alert.site_slug)
+        subject = f"Overvågning oprettet for {site_name} 🏕️"
         sender_email = os.getenv("SMTP_USERNAME", "vores e-mailadresse")
+        cond_text = "Hele perioden bliver ledig" if alert.match_type == "all" else f"Minimum {alert.min_days} sammenhængende dage bliver ledige"
+        period_text = format_danish_range(alert.start_date, alert.end_date)
+        
         html_content = f"""
-        <h2>Din overvågning er aktiv! 🏕️</h2>
-        <p>Vi holder nu øje med pladsen <b>{alert.site_slug}</b> for dig.</p>
-        <ul>
-            <li>Periode: {alert.start_date} til {alert.end_date}</li>
-            <li>Betingelse: {alert.match_type} (min. {alert.min_days} sammenhængende dage)</li>
-        </ul>
-        <br>
-        <p>Du får direkte besked, så snart der bliver en plads ledig!</p>
-        <hr>
-        <p style="font-size: 12px; color: #666;">
-            <b>Vigtigt:</b> For at sikre, at vores notifikationer ikke havner i spam, bedes du tilføje <i>{sender_email}</i> til dine betroede afsendere eller faste kontakter.<br><br>
-            Har dine ferieplaner ændret sig? <a href="{BASE_URL}/#edit-alert?token={token}">Klik her for at redigere din overvågning</a>.<br>
-            Fortryder du? <a href="{BASE_URL}/api/alerts/unsubscribe?token={token}">Afmeld overvågning</a>.
-        </p>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #1e293b; line-height: 1.6;">
+            <h2 style="color: #059669; margin-bottom: 12px;">Din overvågning er aktiv! 🏕️</h2>
+            <p style="font-size: 16px; margin-top: 0;">Vi holder nu automatisk øje med <b>{site_name}</b> for dig.</p>
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin: 16px 0;">
+                <ul style="margin: 0; padding-left: 20px; color: #334155;">
+                    <li style="margin-bottom: 4px;"><b>Plads:</b> {site_name}</li>
+                    <li style="margin-bottom: 4px;"><b>Ønsket periode:</b> {period_text}</li>
+                    <li style="margin-bottom: 4px;"><b>Betingelse:</b> {cond_text}</li>
+                </ul>
+            </div>
+            <p>Du får direkte besked via e-mail i samme øjeblik en afbestilling eller ændring frigiver pladser!</p>
+            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+            <p style="font-size: 12px; color: #64748b;">
+                <b>Vigtigt:</b> For at sikre at vores notifikationer ikke havner i spam, kan du med fordel tilføje <i>{sender_email}</i> til dine betroede afsendere.<br><br>
+                Har dine ferieplaner ændret sig? <a href="{BASE_URL}/#edit-alert?token={token}" style="color: #2563eb;">Klik her for at redigere overvågning</a>.<br>
+                Fortryder du? <a href="{BASE_URL}/api/alerts/unsubscribe?token={token}" style="color: #ef4444;">Afmeld overvågning</a>.
+            </p>
+        </div>
         """
         mailer.send_direct_email(alert.email, subject, html_content)
         

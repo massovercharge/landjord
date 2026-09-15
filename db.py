@@ -420,15 +420,21 @@ def check_and_trigger_alerts():
     """
     Kigger på aktive alerts og availability_snapshots.
     Returnerer en liste af alerts der skal triggeres, og opdaterer deres known_free_dates state.
+    Logikken trigger KUN hvis der sker en ændring, der gør dato(er) ledige ("bliver ledige"),
+    og hvor de frigivne datoer opfylder alertens betingelse (sammenhængende dage el. hele perioden).
     """
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
     # Hent nyeste snapshot per site
     c.execute('''
-        SELECT site_slug, occupied_dates
-        FROM availability_snapshots
-        WHERE date_checked = (SELECT MAX(date_checked) FROM availability_snapshots)
+        SELECT s1.site_slug, s1.occupied_dates
+        FROM availability_snapshots s1
+        JOIN (
+            SELECT site_slug, MAX(date_checked) as max_date
+            FROM availability_snapshots
+            GROUP BY site_slug
+        ) s2 ON s1.site_slug = s2.site_slug AND s1.date_checked = s2.max_date
     ''')
     rows = c.fetchall()
     
@@ -450,7 +456,6 @@ def check_and_trigger_alerts():
     ''')
     
     alerts = c.fetchall()
-    
     triggered_alerts = []
     
     for alert in alerts:
@@ -483,36 +488,53 @@ def check_and_trigger_alerts():
                 current_free.add(d_str)
             curr += timedelta(days=1)
             
-        # Tjek betingelser
+        # Datoer der netop er BLEVET ledige (dvs. i current_free, men ikke i known_free)
+        freed_dates = sorted([d for d in current_free if d not in known_free])
+        
+        # Beregn maksimale sammenhængende blokke af ledige dage i perioden
+        runs = []
+        current_run = []
+        for d_str in all_dates_in_period:
+            if d_str in current_free:
+                current_run.append(d_str)
+            else:
+                if current_run:
+                    runs.append(current_run)
+                    current_run = []
+        if current_run:
+            runs.append(current_run)
+            
+        matching_blocks = []
         is_triggered = False
         
         if match_type == 'all':
-            # ALLE dage i perioden skal være LEDIGE, og der skal være mindst én "ny" ledig dag 
+            # ALLE dage i perioden skal være LEDIGE, og mindst én dag er blevet frigivet
             all_free_now = len(current_free) == len(all_dates_in_period)
-            all_free_before = len(known_free) == len(all_dates_in_period)
-            if all_free_now and not all_free_before:
+            if all_free_now and len(freed_dates) > 0:
                 is_triggered = True
+                matching_blocks = [{
+                    "start": all_dates_in_period[0],
+                    "end": all_dates_in_period[-1],
+                    "dates": list(all_dates_in_period),
+                    "count": len(all_dates_in_period)
+                }]
         elif match_type == 'any':
-            # Trigger hvis der findes en sammenhængende blok af mindst 'min_days' dage i 'current_free'
-            # som ikke er et subset af 'known_free'
+            # Trigger KUN hvis der er dato(er) der er BLEVET ledige (dvs. ændring/afbestilling),
+            # OG den/de indgår i en sammenhængende blok af mindst `min_days` ledige dage.
+            if len(freed_dates) > 0:
+                for run in runs:
+                    if len(run) >= min_days and any(d in freed_dates for d in run):
+                        matching_blocks.append({
+                            "start": run[0],
+                            "end": run[-1],
+                            "dates": list(run),
+                            "count": len(run)
+                        })
+                if matching_blocks:
+                    is_triggered = True
             
-            # Find alle sammenhængende blokke af præcis længde `min_days`
-            # For hver dag i perioden, check om [d, d+1, ..., d+min_days-1] alle er i current_free
-            
-            d_i = d_start
-            while d_i <= d_end - timedelta(days=min_days - 1):
-                block = []
-                for offset in range(min_days):
-                    block.append((d_i + timedelta(days=offset)).strftime("%Y-%m-%d"))
-                
-                # Er hele blokken ledig nu?
-                if all(d in current_free for d in block):
-                    # Var hele blokken ledig før?
-                    if not all(d in known_free for d in block):
-                        is_triggered = True
-                        break
-                d_i += timedelta(days=1)
-            
+        new_known_json = json.dumps(sorted(list(current_free)))
+        
         if is_triggered:
             triggered_alerts.append({
                 "id": a_id,
@@ -521,13 +543,19 @@ def check_and_trigger_alerts():
                 "start_date": start_date,
                 "end_date": end_date,
                 "match_type": match_type,
-                "token": token
+                "min_days": min_days,
+                "token": token,
+                "freed_dates": freed_dates,
+                "matching_blocks": matching_blocks
             })
-            
             # Opdater last_notified_at og known_free_dates
-            new_known_json = json.dumps(sorted(list(current_free)))
             c.execute("UPDATE alerts SET last_notified_at = ?, known_free_dates = ? WHERE id = ?", (now_iso, new_known_json, a_id))
+        elif current_free != known_free:
+            # Opdater known_free_dates selvom den ikke trigger (f.eks. ved ny booking eller hvis antal dage < min_days),
+            # så vi altid har den sande tilstand til fremtidige afbestillinger
+            c.execute("UPDATE alerts SET known_free_dates = ? WHERE id = ?", (new_known_json, a_id))
             
     conn.commit()
     conn.close()
     return triggered_alerts
+

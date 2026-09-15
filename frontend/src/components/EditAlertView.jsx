@@ -144,7 +144,7 @@ const EditAlertView = () => {
                         <label>Betingelse for besked:</label>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                             <input type="radio" name="match_type" value="all" checked={form.match_type === 'all'} onChange={() => setForm({...form, match_type: 'all'})} />
-                            Hele perioden skal være ledig
+                            Hele perioden bliver ledig
                         </label>
                         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                             <input type="radio" name="match_type" value="any" checked={form.match_type === 'any'} onChange={() => setForm({...form, match_type: 'any'})} />
@@ -153,7 +153,7 @@ const EditAlertView = () => {
                                 if (val > periodDays) val = periodDays;
                                 if (val < 1) val = 1;
                                 setForm({...form, min_days: val, match_type: 'any'});
-                            }} onClick={() => setForm({...form, match_type: 'any'})} disabled={form.match_type !== 'any'} style={{ width: '60px', padding: '2px 5px', backgroundColor: 'var(--bg-color)', border: '1px solid var(--card-border)', color: 'white', borderRadius: '4px' }} /> sammenhængende dage er ledige
+                            }} onClick={() => setForm({...form, match_type: 'any'})} disabled={form.match_type !== 'any'} style={{ width: '60px', padding: '2px 5px', backgroundColor: 'var(--bg-color)', border: '1px solid var(--card-border)', color: 'white', borderRadius: '4px' }} /> sammenhængende dage bliver ledige
                         </label>
                     </div>
 
