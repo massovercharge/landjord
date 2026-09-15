@@ -393,6 +393,7 @@ export default function StatsView({ sites, isUnlocked = false, unlockedKey = '',
                     stroke="#94a3b8" 
                     tick={{fontSize: isMobile ? 10 : 12}} 
                     tickFormatter={(name) => isMobile ? name.slice(0, 3) : name} 
+                    interval={0}
                   />
                   <YAxis stroke="#94a3b8" tick={{fontSize: isMobile ? 10 : 12}} width={isMobile ? 30 : 40} />
                   <Tooltip 
