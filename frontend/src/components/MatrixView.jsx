@@ -37,8 +37,8 @@ export default function MatrixView({ sites, getImageUrl, goToBooking }) {
   return (
      <div className="view-container matrix-view">
        <div className="view-header">
-          <h2>Kalendervisning ({daysCount} dage)</h2>
-          <p><strong>Tip:</strong> Grøn = Ledig. Tryk på et grønt felt for at booke 1 nat. (Hold musen over pladsnavn på pc for billede).</p>
+          <h2>Kalendervisning</h2>
+          <p><strong>Tip:</strong> Grøn = Ledig. Tryk på et grønt felt for at booke 1 nat. Scroll mod højre for at se længere frem i tiden (Hold musen over pladsnavn på pc for billede).</p>
        </div>
        <div className="matrix-table-wrapper" onScroll={handleScroll}>
          <table className="matrix-table">
