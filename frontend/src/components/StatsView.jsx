@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-export default function StatsView({ sites }) {
+export default function StatsView({ sites, isUnlocked = false, unlockedKey = '' }) {
   const [period, setPeriod] = useState(30);
   const [selectedSiteSlug, setSelectedSiteSlug] = useState('all');
   const [trends, setTrends] = useState(null);
@@ -24,36 +24,44 @@ export default function StatsView({ sites }) {
   const [watchlistStatus, setWatchlistStatus] = useState(null);
 
   const siteOccupied = useMemo(() => {
-    return sites.find(s => s.slug === selectedSiteSlug)?.occupiedDates || [];
-  }, [sites, selectedSiteSlug]);
+    if (selectedSiteSlug === 'all') return [];
+    const site = sites.find(s => s.slug === selectedSiteSlug);
+    return site ? site.occupiedDates || [] : [];
+  }, [selectedSiteSlug, sites]);
 
   const parseDate = (dStr) => {
     if (!dStr) return null;
-    const [y, m, d] = dStr.split('-');
+    const [y, m, d] = dStr.split('-').map(Number);
     return new Date(y, m - 1, d);
   };
 
   const formatDate = (date) => {
     if (!date) return '';
-    return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   };
 
   const periodDays = useMemo(() => {
     if (!watchlistForm.start_date || !watchlistForm.end_date) return 1;
     const start = parseDate(watchlistForm.start_date);
     const end = parseDate(watchlistForm.end_date);
-    if (!start || !end) return 1;
-    const diff = (end - start) / (1000 * 60 * 60 * 24);
-    return Math.max(1, Math.floor(diff) + 1);
+    if (!start || !end || end < start) return 1;
+    return Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
   }, [watchlistForm.start_date, watchlistForm.end_date]);
 
   const submitWatchlist = async (e) => {
     e.preventDefault();
     setWatchlistStatus('submitting');
     try {
+        const passwordHeader = unlockedKey || (typeof localStorage !== 'undefined' ? localStorage.getItem('landjord_alert_key') : '') || '';
         const res = await fetch('/api/alerts', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Alert-Password': passwordHeader
+            },
             body: JSON.stringify({
                 email: watchlistForm.email,
                 site_slug: selectedSiteSlug,
@@ -74,7 +82,7 @@ export default function StatsView({ sites }) {
   };
 
   const renderWatchlistModal = () => {
-    if (!showWatchlistModal) return null;
+    if (!isUnlocked || !showWatchlistModal) return null;
     return (
         <div className="modal-overlay">
             <div className="modal-content watchlist-modal">
@@ -315,7 +323,7 @@ export default function StatsView({ sites }) {
           <div className="chart-card">
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
               <h3 style={{marginBottom: 0, borderBottom: 'none', paddingBottom: 0}}>{isSingleSite ? 'Booking Kalender' : `Efterspørgsel (De næste ${period} dage)`}</h3>
-              {isSingleSite && (
+              {isUnlocked && isSingleSite && (
                   <button className="watchlist-btn" onClick={() => setShowWatchlistModal(true)}>
                       Overvåg plads 🔔
                   </button>

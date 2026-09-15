@@ -1064,3 +1064,42 @@ body {
   background-color: rgba(16, 185, 129, 0.2) !important;
   color: #6ee7b7 !important;
 }
+
+/* App Footer & Discreet Unlock Button */
+.app-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 1.5rem 1rem 2rem 1rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .app-footer {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+.discreet-lock-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 0.85rem;
+  opacity: 0.25;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  line-height: 1;
+}
+
+.discreet-lock-btn:hover {
+  opacity: 0.85;
+  transform: scale(1.15);
+}
+

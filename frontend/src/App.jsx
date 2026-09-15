@@ -13,6 +13,8 @@ import HomeView from './components/HomeView';
 import StatsView from './components/StatsView';
 import EditAlertView from './components/EditAlertView';
 import BottomNav from './components/BottomNav';
+import UnlockModal from './components/UnlockModal';
+import { useAlertAuth } from './hooks/useAlertAuth';
 
 import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -32,11 +34,18 @@ const ENABLE_EXTERNAL_IMAGES = true;
 
 function App() {
   const { sites, loading } = useSites();
+  const { isUnlocked, unlockedKey, unlock, lock } = useAlertAuth();
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
   
   // App Modes
   const getInitialViewMode = () => {
     const hash = window.location.hash.split('?')[0].replace('#', '');
-    return ['home', 'map', 'matrix', 'weekends', 'stats', 'edit-alert'].includes(hash) ? hash : 'home';
+    if (hash === 'edit-alert') {
+      const hasToken = window.location.hash.includes('token=');
+      const storedKey = typeof localStorage !== 'undefined' ? localStorage.getItem('landjord_alert_key') : null;
+      return (hasToken || storedKey) ? 'edit-alert' : 'home';
+    }
+    return ['home', 'map', 'matrix', 'weekends', 'stats'].includes(hash) ? hash : 'home';
   };
   const [viewMode, setViewMode] = useState(getInitialViewMode());
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -57,6 +66,13 @@ function App() {
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
+
+  // Guard edit-alert view: redirect to home if no token and not unlocked
+  useEffect(() => {
+    if (viewMode === 'edit-alert' && !window.location.hash.includes('token=') && !isUnlocked) {
+      setViewMode('home');
+    }
+  }, [viewMode, isUnlocked]);
   
   // Map Filter State
   const [filterStart, setFilterStart] = useState('');
@@ -191,7 +207,7 @@ function App() {
               <HomeView sites={sites} setViewMode={setViewMode} />
             )}
             {viewMode === 'stats' && (
-              <StatsView sites={sites} />
+              <StatsView sites={sites} isUnlocked={isUnlocked} unlockedKey={unlockedKey} />
             )}
             {viewMode === 'map' && (
               <MapView 
@@ -222,8 +238,26 @@ function App() {
           </>
         )}
       </main>
+      <footer className="app-footer">
+        <span>Landjord Overblik (Uofficielt)</span>
+        <button 
+          type="button" 
+          className="discreet-lock-btn" 
+          onClick={() => setIsUnlockModalOpen(true)}
+          aria-label="Adgang"
+        >
+          {isUnlocked ? '🔓' : '🔒'}
+        </button>
+      </footer>
       <BottomNav viewMode={viewMode} setViewMode={setViewMode} />
       <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
+      <UnlockModal 
+        isOpen={isUnlockModalOpen} 
+        onClose={() => setIsUnlockModalOpen(false)} 
+        isUnlocked={isUnlocked} 
+        unlock={unlock} 
+        lock={lock} 
+      />
     </div>
   );
 }

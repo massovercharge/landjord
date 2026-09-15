@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Header
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from playwright.async_api import async_playwright
@@ -52,6 +52,9 @@ def get_site_display_name(site_slug: str) -> str:
             return s.get('name', site_slug)
     return site_slug.replace('-', ' ').title()
 
+class PasswordVerify(BaseModel):
+    password: str
+
 class AlertCreate(BaseModel):
     email: str
     site_slug: str
@@ -66,6 +69,7 @@ class AlertUpdate(BaseModel):
     match_type: str
     min_days: int = 1
 
+ALERT_PASSWORD = os.getenv("ALERT_PASSWORD", "landjord2026")
 ENABLE_TREND_ANALYSIS = os.getenv("ENABLE_TREND_ANALYSIS", "true").lower() == "true"
 BASE_URL = os.getenv("BASE_URL", "https://landjord.aegaarden.dk").rstrip("/")
 
@@ -408,8 +412,16 @@ async def get_booking_trends(site_slug: str = "all"):
         
     return JSONResponse(content={"trends": result, "total": total})
 
+@app.post("/api/alerts/verify-password")
+async def verify_alert_password(payload: PasswordVerify):
+    if payload.password == ALERT_PASSWORD:
+        return {"status": "success", "message": "Adgang godkendt"}
+    raise HTTPException(status_code=401, detail="Ugyldig adgangskode")
+
 @app.post("/api/alerts")
-async def create_alert(alert: AlertCreate):
+async def create_alert(alert: AlertCreate, x_alert_password: str = Header(None)):
+    if not x_alert_password or x_alert_password != ALERT_PASSWORD:
+        raise HTTPException(status_code=401, detail="Uautoriseret adgang. Korrekt adgangskode er påkrævet.")
     try:
         token = db.create_alert(
             email=alert.email,
